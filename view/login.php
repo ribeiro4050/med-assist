@@ -20,7 +20,8 @@
                     <h4>Acesso ao Sistema</h4>
                 </div>
                 <div class="card-body">
-                    <form action="../controller/acoes.php" method="post">
+
+                    <form action="../controller/login-acoes.php" method="post">
                         <div id="login-padrao">
                             <h5 class="text-center text-primary mb-3">Login de Usuário</h5>
                             <div class="mb-3">

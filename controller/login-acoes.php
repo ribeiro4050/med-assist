@@ -57,7 +57,7 @@
         if ($mensagem_erro !== null) {
             // Se a função retornar uma mensagem, significa que houve erro
             $_SESSION['mensagem'] = $mensagem_erro;
-            header('Location: tela-login.php');
+            header('Location: ../view/login.php');
             exit;
         }
     }
@@ -73,14 +73,14 @@
         if ($mensagem_erro !== null) {
             // Se a função retornar uma mensagem, significa que houve erro
             $_SESSION['mensagem'] = $mensagem_erro;
-            header('Location: tela-login.php');
+            header('Location: ../view/login.php');
             exit;
         }
     }
 
     // Se a página for acessada sem um botão de login ser clicado
     $_SESSION['mensagem'] = "Acesso inválido.";
-    header('Location: tela-login.php');
+    header('Location: ../view/login.php');
     exit;
 
 ?>
