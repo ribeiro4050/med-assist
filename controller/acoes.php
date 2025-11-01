@@ -111,8 +111,124 @@
         }
     }
 
+    // --- CRIAÇÃO DE RECEITA ---
+    if (isset($_POST['create_receita'])) {
+        // Coleta e sanitização dos dados da Receita Principal
+        $medico_id = mysqli_real_escape_string($conexao, $_POST['medico_id']);
+        $paciente_id = mysqli_real_escape_string($conexao, $_POST['paciente_id']);
+        $tipo_receita = mysqli_real_escape_string($conexao, $_POST['tipo_receita']);
+        $observacoes = mysqli_real_escape_string($conexao, trim($_POST['observacoes'] ?? ''));
+        $data_prescricao = date('Y-m-d H:i:s'); // Define a data/hora atual da prescrição
 
-    // --- 4. LÓGICA DE LOGIN (NOVA) ---
+        // Coleta dos arrays dos Itens de Receita
+        $medicamento_nomes = $_POST['medicamento_nome'];
+        $concentracaos = $_POST['concentracao'];
+        $quantidade_totais = $_POST['quantidade_total'];
+        $posologias = $_POST['posologia'];
+
+        // Validação dos campos obrigatórios
+        if (empty($paciente_id) || empty($tipo_receita) || empty($medicamento_nomes) || count($medicamento_nomes) == 0) {
+            $_SESSION['mensagem'] = "Campos obrigatórios: Paciente e  Medicamento não foram preenchidos.";
+            header('Location: ../view/receita-create.php');
+            exit;
+        }
+
+        // inserção da receita
+        // caso observações esteja vazio, insere NULL no banco
+        $sql_receita = "INSERT INTO receitas 
+                        (medico_id, paciente_id, data_prescricao, tipo_receita, observacoes) 
+                        VALUES ('$medico_id', '$paciente_id', '$data_prescricao', '$tipo_receita', 
+                        " . (empty($observacoes) ? "NULL" : "'$observacoes'") . ")";
+
+        if (mysqli_query($conexao, $sql_receita)) {
+            // obtem o id da receita criada
+            $receita_id = mysqli_insert_id($conexao);
+            $sucesso_itens = true;
+            $erros_itens = 0;
+
+            // loop para inserir cada item de receita
+            foreach ($medicamento_nomes as $key => $nome) {
+                $nome_seguro = mysqli_real_escape_string($conexao, trim($nome));
+                $concentracao_seguro = mysqli_real_escape_string($conexao, trim($concentracaos[$key]));
+                $quantidade_seguro = mysqli_real_escape_string($conexao, trim($quantidade_totais[$key]));
+                $posologia_seguro = mysqli_real_escape_string($conexao, trim($posologias[$key]));
+
+                // Validação de item (garantir que não há itens vazios se o usuário clonou mas não preencheu)
+                if (empty($nome_seguro) || empty($concentracao_seguro) || empty($quantidade_seguro) || empty($posologia_seguro)) {
+                    // Ignora itens incompletos, mas não interrompe o processo.
+                    continue; 
+                }
+
+                $sql_item = "INSERT INTO itens_receita 
+                             (receita_id, medicamento_nome, concentracao, quantidade_total, posologia) 
+                             VALUES ('$receita_id', '$nome_seguro', '$concentracao_seguro', '$quantidade_seguro', '$posologia_seguro')";
+                
+                if (!mysqli_query($conexao, $sql_item)) {
+                    $sucesso_itens = false;
+                    $erros_itens++;
+                }
+            }
+
+            // resultado da criação da receita
+            if ($sucesso_itens) {
+                $_SESSION['mensagem'] = "Receita e todos os itens prescritos com sucesso! ID: " . $receita_id;
+                header('Location: ../view/receitas.php?id=' . $receita_id); // Redireciona para a visualização
+                exit;
+            } else {
+                // Em caso de falha na inserção de itens, talvez seja necessário apagar a receita principal, 
+                // mas por agora, um alerta ja ta bom.
+                $_SESSION['mensagem'] = "Receita criada, mas falha ao inserir $erros_itens item(s) de medicamento. Erro: " . mysqli_error($conexao);
+                header('Location: ../view/receitas.php');
+                exit;
+            }
+
+        } else {
+            // Falha na inserção da receita principal
+            $_SESSION['mensagem'] = "Erro ao criar a Receita. Erro: " . mysqli_error($conexao);
+            header('Location: ../view/receita-create.php');
+            exit;
+        }
+    }
+
+    // --- EXCLUSÃO DE RECEITA ---
+    if(isset($_POST['delete_receita'])){
+        $receita_id = mysqli_real_escape_string($conexao, $_POST['delete_receita']);
+        $medico_id_logado = $_SESSION['id_usuario'];
+        $role = $_SESSION['role_usuario'];
+
+        // Verificar se o médico é o dono da receita
+        // Admin pode deletar qualquer coisa quando a gente criar um admin
+        // Médico só pode deletar suas próprias.
+        // mas no geral a logica é a mesma do usuer
+        $sql_select = "SELECT medico_id FROM receitas WHERE id = '$receita_id'";
+        $query_select = mysqli_query($conexao, $sql_select);
+        $receita = mysqli_fetch_assoc($query_select);
+        
+        if ($receita && $receita['medico_id'] != $medico_id_logado && $role != 'admin') {
+            $_SESSION['mensagem'] = "Você não tem permissão para excluir esta receita.";
+            header('Location: ../view/receitas.php');
+            exit;
+        }
+
+        // Devido ao ON DELETE CASCADE:
+        // Deletar a receita principal
+        // Os itens relacionados (itens_receita) serão deletados automaticamente.
+        $sql = "DELETE FROM receitas WHERE id = '$receita_id'";
+
+        mysqli_query($conexao, $sql);
+
+        if(mysqli_affected_rows($conexao) > 0) {
+            $_SESSION['mensagem'] = "Receita e todos os itens deletados com sucesso!";
+            header('Location: ../view/receitas.php');
+            exit;
+        } else {
+            $_SESSION['mensagem'] = "Receita não foi deletada ou não foi encontrada. Erro: " . mysqli_error($conexao);
+            header('Location: ../view/receitas.php');
+            exit;
+        }
+    }
+
+    // --- 4. LÓGICA DE LOGIN ---
     if(isset($_POST['login_usuario'])){
         $email = mysqli_real_escape_string($conexao, $_POST['email'] ?? '');
         $registro = mysqli_real_escape_string($conexao, $_POST['registro'] ?? '');
@@ -176,7 +292,7 @@
     }
 
 
-    // --- 5. LÓGICA DE LOGOUT (NOVA) ---
+    // --- 5. LÓGICA DE LOGOUT ---
     if(isset($_GET['logout'])){
         // Não precisa de session_start() aqui pois já está no topo, mas é boa prática se fosse um arquivo isolado
         session_unset(); // Limpa todas as variáveis de sessão

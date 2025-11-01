@@ -2,7 +2,19 @@
     <div class="container-md d-flex justify-content-between">
         <a href="index.php" class="navbar-brand">MedAssist</a>
         <?php if(isset($_SESSION['logado']) && $_SESSION['logado'] === true): ?>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav d-flex flex-row align-items-center">
+                
+                <?php if(isset($_SESSION['role_usuario']) && $_SESSION['role_usuario'] === 'medico'): ?>
+                <li class="nav-item me-3">
+                    <a href="receitas.php" class="btn btn-outline-info btn-sm">
+                        Receituário
+                    </a>
+                </li>
+                <?php endif; ?>
+                
+                <li class="nav-item me-3">
+                    <a href="acoes.php?logout=true" class="btn btn-sm btn-outline-danger">Sair</a>
+                </li>
                 <li class="nav-item">
                     <a href="perfil.php" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
@@ -12,6 +24,8 @@
                     </a>
                 </li>
             </ul>
+        <?php else: ?>
+             <a href="login.php" class="btn btn-outline-light">Login</a>
         <?php endif; ?>
     </div>
 </nav>

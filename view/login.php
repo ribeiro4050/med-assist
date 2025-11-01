@@ -2,7 +2,7 @@
     session_start();
 
     // Inclui o arquivo de mensagem para exibir alertas de erro ou sucesso
-    include('mensagem.php'); 
+    include('../controller/mensagem.php'); 
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -20,7 +20,7 @@
                     <h4>Acesso ao Sistema</h4>
                 </div>
                 <div class="card-body">
-                    <form action="acoes.php" method="post">
+                    <form action="../controller/acoes.php" method="post">
                         <div id="login-padrao">
                             <h5 class="text-center text-primary mb-3">Login de Usuário</h5>
                             <div class="mb-3">
