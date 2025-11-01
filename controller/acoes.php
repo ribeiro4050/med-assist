@@ -1,7 +1,7 @@
 <?php
 
     session_start();
-    require 'conexao.php'; // Inclui a conexão com o banco de dados
+    require '../Model/conexao.php'; // Inclui a conexão com o banco de dados
 
     // --- 1. LÓGICA DE CRIAÇÃO (CREATE) ---
     if(isset($_POST['create_usuario'])){
@@ -22,7 +22,7 @@
         // Validação básica para roles de profissionais
         if (($role == 'medico' && empty($crm_registro)) || ($role == 'enfermeiro' && empty($coren_registro))) {
             $_SESSION['mensagem'] = "O registro (CRM/COREN) é obrigatório para o role selecionado.";
-            header('Location: usuario-create.php'); 
+            header('Location: ../view/usuario-create.php'); 
             exit;
         }
 
@@ -37,11 +37,11 @@
 
         if($query) { 
             $_SESSION['mensagem'] = "Usuário criado com sucesso";
-            header('Location: index.php'); 
+            header('Location: ../view/index.php'); 
             exit;
         } else {
             $_SESSION['mensagem'] = "Usuário não foi criado. Erro: " . mysqli_error($conexao);
-            header('Location: usuario-create.php');
+            header('Location: ../view/usuario-create.php');
             exit;
         }
     }
@@ -83,11 +83,11 @@
 
         if(mysqli_affected_rows($conexao) > 0){ 
             $_SESSION['mensagem'] = "Usuário atualizado com sucesso";
-            header('Location: index.php'); 
+            header('Location: ../view/index.php'); 
             exit;
         } else {
             $_SESSION['mensagem'] = "Nenhuma alteração feita ou Usuário não foi encontrado/atualizado. Erro: " . mysqli_error($conexao);
-            header('Location: index.php');
+            header('Location: ../view/index.php');
             exit;
         }
     }
@@ -102,11 +102,11 @@
 
         if(mysqli_affected_rows($conexao) > 0) {
             $_SESSION['mensagem'] = "Usuário deletado com sucesso";
-            header('Location: index.php');
+            header('Location: ../view/index.php');
             exit;
         } else {
             $_SESSION['mensagem'] = "Usuário não foi deletado. Erro: " . mysqli_error($conexao);
-            header('Location: index.php');
+            header('Location: ../view/index.php');
             exit;
         }
     }
@@ -129,7 +129,7 @@
             $sql = "SELECT * FROM usuarios WHERE crm_registro = '$registro' OR coren_registro = '$registro'";
         } else {
             $_SESSION['mensagem'] = "Preencha o Email ou o Registro (CRM/COREN).";
-            header('Location: login.php');
+            header('Location: ../view/login.php');
             exit;
         }
         
@@ -145,7 +145,7 @@
                 // Validação para login de profissional: se usou o campo registro, a role deve ser de profissional
                 if (!empty($registro) && !in_array($usuario['role'], ['medico', 'enfermeiro', 'admin'])) {
                     $_SESSION['mensagem'] = "Acesso de profissional negado para este registro.";
-                    header('Location: login.php');
+                    header('Location: ../view/login.php');
                     exit;
                 }
 
@@ -157,20 +157,20 @@
 
                 $_SESSION['mensagem'] = "Bem-vindo(a), " . $usuario['nome'] . "! Seu nível de acesso é: " . strtoupper($usuario['role']);
 
-                // Redireciona para a página inicial (index.php)
-                header('Location: index.php');
+                // Redireciona para a página inicial (../view/index.php)
+                header('Location: ../view/index.php');
                 exit;
                 
             } else {
                 // Senha incorreta
                 $_SESSION['mensagem'] = "Senha incorreta.";
-                header('Location: login.php');
+                header('Location: ../view/login.php');
                 exit;
             }
         } else {
             // Usuário não encontrado
             $_SESSION['mensagem'] = "Credenciais não encontradas. Verifique o Email ou o Registro.";
-            header('Location: login.php');
+            header('Location: ../view/login.php');
             exit;
         }
     }
@@ -183,7 +183,7 @@
         session_destroy(); // Destrói a sessão
         $_SESSION['mensagem'] = "Sessão encerrada com sucesso.";
         // Redireciona para a tela de login
-        header('Location: login.php');
+        header('Location: ../view/login.php');
         exit;
     }
 

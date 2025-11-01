@@ -1,5 +1,5 @@
 <?php 
-    require 'conexao.php';
+    require '../Model/conexao.php';
 ?>
 <!doctype html>
 <html lang="en">

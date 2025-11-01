@@ -1,7 +1,7 @@
 <?php 
 session_start();
 // inicia a sessão para usar variáveis de sessão, tanto para salvar quanto para ler, como no caso de exibir mensagens para o usuario, sem esse comando a sessão não funciona logo as mensagens de erro ou sucesso não aparecem  
-require 'conexao.php';
+require '../Model/conexao.php';
 ?>
 <!doctype html>
 <html lang="en">
@@ -15,7 +15,7 @@ require 'conexao.php';
   <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-4">
-      <?php include('mensagem.php')?>
+      <?php include('../controller/mensagem.php')?>
       <!-- exibe a mensagem de sucesso erro ou alerta para o usuario, usando dados salvos na sessão, no caso $_SESSION['mensagem']-->
       <div class="row">
         <div class="col-md-12">
@@ -75,7 +75,7 @@ require 'conexao.php';
                       <!--icone de lapis-->
                       Editar</a>
 
-                      <form action="acoes.php" method="post" class="d-inline">
+                      <form action="../controller/acoes.php" method="post" class="d-inline">
                         <button onclick="return confirm('Tem certeza que deseja excluir?')" type="submit" name="delete_usuario" value="<?= $usuario['id']?>" class="btn btn-danger btn-sm">
                           <span class="bi-trash3-fill"></span> &nbsp;
                           <!--icone de lixeira-->

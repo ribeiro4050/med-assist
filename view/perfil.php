@@ -1,6 +1,6 @@
 <?php 
     session_start();
-    require 'conexao.php';
+    require '../Model/conexao.php';
 
     // Redireciona se o usuário não estiver logado
     if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {

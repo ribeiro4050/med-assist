@@ -1,6 +1,6 @@
 <?php
     session_start();
-    require 'conexao.php';
+    require '../Model/conexao.php';
 
     // --- Função de Login Geral para Reutilização ---
     function realizarLogin($conexao, $email, $senha_digitada, $registro_profissional = null) {
