@@ -1,10 +1,5 @@
 <?php 
-// view/historico-paciente-view.php
-
-// ATENÇÃO: A variável $nome_paciente e $historico são passadas pelo Controller.
-
-// INCLUA O SEU ARQUIVO DE CABEÇALHO/NAVBAR AQUI!
-// require_once 'navbar.php'; 
+require_once 'navbar.php'; 
 
 ?>
 

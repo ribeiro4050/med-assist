@@ -1,5 +1,4 @@
 <?php
-// Model/historico-paciente-model.php
 
 /**
  * Busca todos os itens (medicamentos) de uma receita específica.
@@ -22,11 +21,11 @@ function buscarItensReceita($conexao, $receita_id) {
 }
 
 /**
- * Busca o nome de um paciente pelo seu ID na nova tabela 'Paciente'.
+ * Busca o nome de um paciente pelo seu ID na tabela 'usuarios'.
  */
 function buscarNomePaciente($conexao, $paciente_id) {
-    // ATENÇÃO: Agora busca na tabela 'Paciente'
-    $sql = "SELECT nome FROM Paciente WHERE id = ?"; 
+    // ⚠️ CORREÇÃO CRÍTICA: Busca agora na tabela 'usuarios' e verifica o role='paciente'
+    $sql = "SELECT nome FROM usuarios WHERE id = ? AND role = 'paciente'"; 
     
     if ($stmt = mysqli_prepare($conexao, $sql)) {
         mysqli_stmt_bind_param($stmt, "i", $paciente_id);
@@ -35,7 +34,8 @@ function buscarNomePaciente($conexao, $paciente_id) {
 
         if ($linha = mysqli_fetch_assoc($resultado)) {
             mysqli_stmt_close($stmt);
-            return htmlspecialchars($linha['nome']);
+            // Retorna a string do nome, sem htmlspecialchars (o Controller ou View fará o escape)
+            return $linha['nome']; 
         }
         mysqli_stmt_close($stmt);
     }
@@ -52,7 +52,8 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
     // ------------------------------------
     // 1. Buscar Exames
     // ------------------------------------
-    $sql_exames = "SELECT *, data, 'Exame' AS tipo_evento FROM Exame WHERE paciente_id = ? ORDER BY data DESC";
+    // ATENÇÃO: Use `exame` (minúsculo) conforme seu script SQL
+    $sql_exames = "SELECT *, data, 'Exame' AS tipo_evento FROM exame WHERE paciente_id = ? ORDER BY data DESC";
     if ($stmt_exames = mysqli_prepare($conexao, $sql_exames)) {
         mysqli_stmt_bind_param($stmt_exames, "i", $paciente_id);
         mysqli_stmt_execute($stmt_exames);
@@ -66,7 +67,8 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
     // ------------------------------------
     // 2. Buscar Diagnósticos
     // ------------------------------------
-    $sql_diagnosticos = "SELECT *, data, 'Diagnóstico' AS tipo_evento FROM Diagnostico WHERE paciente_id = ? ORDER BY data DESC";
+    // ATENÇÃO: Use `diagnostico` (minúsculo) conforme seu script SQL
+    $sql_diagnosticos = "SELECT *, data, 'Diagnóstico' AS tipo_evento FROM diagnostico WHERE paciente_id = ? ORDER BY data DESC";
     if ($stmt_diagnosticos = mysqli_prepare($conexao, $sql_diagnosticos)) {
         mysqli_stmt_bind_param($stmt_diagnosticos, "i", $paciente_id);
         mysqli_stmt_execute($stmt_diagnosticos);
@@ -95,9 +97,11 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
         mysqli_stmt_close($stmt_receitas);
     }
 
-    // 4. Ordenar o Histórico Completo Cronologicamente
+    // 4. Ordenar o Histórico Completo Cronologicamente (Mais recente primeiro)
     usort($historico_combinado, function($a, $b) {
-        return strtotime($b['data']) - strtotime(isset($a['data']) ? $a['data'] : '1970-01-01') - strtotime(isset($b['data']) ? $b['data'] : '1970-01-01');
+        // CORREÇÃO: A ordenação deve ser baseada na data em formato UNIX (timestamp)
+        // O valor negativo inverte a ordem (para ser DESC)
+        return strtotime($b['data']) - strtotime($a['data']);
     });
 
     return $historico_combinado;
