@@ -36,6 +36,26 @@
 
     $receita = mysqli_fetch_array($query_receita);
 
+    $header_color = 'bg-success'; // Cor de fallback, pode ser Simples
+    $text_color = 'text-white'; // Cor do texto padrão
+
+    switch ($receita['tipo_receita']) {
+        case 'Amarela':
+            // receita amarela
+            $header_color = 'bg-warning'; 
+            $text_color = 'text-white';
+            break;
+        case 'Azul':
+            // receita azul
+            $header_color = 'bg-primary'; 
+            $text_color = 'text-white';
+            break;
+        default:
+            // receita simples )
+            $header_color = 'bg-light'; 
+            $text_color = 'text-dark'; // Usa texto escuro no fundo claro
+            break;
+        }
     // Médico só pode ver SUAS receitas, Paciente pode ver SÓ as dele.
     if ($role === 'medico' && $receita['medico_id'] != $usuario_id) {
         $_SESSION['mensagem'] = "Acesso negado. Esta receita foi prescrita por outro profissional.";
@@ -67,7 +87,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card shadow">
-                    <div class="card-header bg-info text-white">
+                    <div class="card-header <?= $header_color ?> <?= $text_color ?>">
                         <h4 class="mb-0">
                             Receituário #<?= $receita_id ?> (<?= $receita['tipo_receita'] ?>)
                             <a href="receitas.php" class="btn btn-light float-end">Voltar</a>
@@ -76,7 +96,7 @@
                     <div class="card-body p-5">
                         
                         <div class="text-center mb-4 border-bottom pb-3">
-                            <h5 class="text-primary">Doutor <?= $receita['nome_medico'] ?></h5>
+                            <h5 class="text-primary">Dr. <?= $receita['nome_medico'] ?></h5>
                             <p class="mb-1">CRM: <?= $receita['crm_registro'] ?? 'N/D' ?></p>
                             <p class="mb-0">Data da Prescrição: <?= date('d/m/Y H:i', strtotime($receita['data_prescricao'])) ?></p>
                         </div>
@@ -114,6 +134,7 @@
                             <a href="receita-edit.php?id=<?= $receita_id ?>" class="btn btn-success">
                                 <span class="bi-pencil-fill"></span> Editar
                             </a>
+                            <!-- comando window print chama o dialogo de impressao do navegador, bem legal -->
                             <button onclick="window.print()" class="btn btn-secondary">
                                 <span class="bi-printer"></span> Imprimir
                             </button>

@@ -3,7 +3,7 @@
     session_start();
     require '../Model/conexao.php'; // Inclui a conexão com o banco de dados
 
-    // --- 1. LÓGICA DE CRIAÇÃO (CREATE) ---
+    // --- LÓGICA DE CRIAÇÃO (CREATE) ---
     if(isset($_POST['create_usuario'])){
         // mysqli_real_escape_string e trim previnem SQL Injection e removem espaços
         $nome = mysqli_real_escape_string($conexao, trim($_POST['nome']));
@@ -47,7 +47,7 @@
     }
 
 
-    // --- 2. LÓGICA DE ATUALIZAÇÃO (UPDATE) ---
+    // ---  LÓGICA DE ATUALIZAÇÃO (UPDATE) ---
     if(isset($_POST['update_usuario'])){
         $usuario_id = mysqli_real_escape_string($conexao, $_POST['usuario_id']);
         $nome = mysqli_real_escape_string($conexao, trim($_POST['nome']));
@@ -92,7 +92,7 @@
         }
     }
 
-    // --- 3. LÓGICA DE EXCLUSÃO (DELETE) ---
+    // ---  LÓGICA DE EXCLUSÃO (DELETE) ---
     if(isset($_POST['delete_usuario'])){
         $usuario_id = mysqli_real_escape_string($conexao, $_POST['delete_usuario']);
         
@@ -202,6 +202,8 @@
         // mas no geral a logica é a mesma do usuer
         $sql_select = "SELECT medico_id FROM receitas WHERE id = '$receita_id'";
         $query_select = mysqli_query($conexao, $sql_select);
+
+        // o mysqli_fetch_assoc retorna um array associativo com os dados da consulta e pula para a próxima linha
         $receita = mysqli_fetch_assoc($query_select);
         
         if ($receita && $receita['medico_id'] != $medico_id_logado && $role != 'admin') {
@@ -228,7 +230,78 @@
         }
     }
 
-    // --- 4. LÓGICA DE LOGIN ---
+    // --- EDIÇÃO DE RECEITA ---
+    if (isset($_POST['update_receita'])) {
+        // coleta dos dados principais
+        $receita_id = mysqli_real_escape_string($conexao, $_POST['receita_id']);
+        $medico_id = mysqli_real_escape_string($conexao, $_POST['medico_id']); // Usado para validação de segurança
+        $paciente_id = mysqli_real_escape_string($conexao, $_POST['paciente_id']);
+        $tipo_receita = mysqli_real_escape_string($conexao, $_POST['tipo_receita']);
+        $observacoes = mysqli_real_escape_string($conexao, trim($_POST['observacoes'] ?? ''));
+
+        // Validação de acesso (Apenas o criador pode atualizar)
+        if ($_SESSION['role_usuario'] !== 'admin' && $medico_id != $_SESSION['id_usuario']) {
+            $_SESSION['mensagem'] = "Ação negada. Você não é o prescritor desta receita.";
+            header('Location: ../view/receitas.php');
+            exit;
+        }
+
+        // atualização da receita principal
+        $sql_update_receita = "UPDATE receitas SET 
+                                paciente_id = '$paciente_id', 
+                                tipo_receita = '$tipo_receita', 
+                                observacoes = " . (empty($observacoes) ? "NULL" : "'$observacoes'") . "
+                                WHERE id = '$receita_id'";
+
+        mysqli_query($conexao, $sql_update_receita);
+
+        // exclui todos os itens antigos antes de inserir
+        $sql_delete_itens = "DELETE FROM itens_receita WHERE receita_id = '$receita_id'";
+        mysqli_query($conexao, $sql_delete_itens); 
+
+        // processa os novos itens enviados
+        
+        $medicamento_nomes = $_POST['medicamento_nome'] ?? []; // Assume array vazio se nada for enviado
+        $concentracaos = $_POST['concentracao'] ?? [];
+        $quantidade_totais = $_POST['quantidade_total'] ?? [];
+        $posologias = $_POST['posologia'] ?? [];
+        
+        $sucesso_itens = true;
+        
+        // Loop sobre os itens enviados
+        foreach ($medicamento_nomes as $key => $nome) {
+            
+            $nome_seguro = mysqli_real_escape_string($conexao, trim($nome));
+            $concentracao_seguro = mysqli_real_escape_string($conexao, trim($concentracaos[$key] ?? ''));
+            $quantidade_seguro = mysqli_real_escape_string($conexao, trim($quantidade_totais[$key] ?? ''));
+            $posologia_seguro = mysqli_real_escape_string($conexao, trim($posologias[$key] ?? ''));
+
+            // Ignora itens incompletos ou vazios
+            if (empty($nome_seguro)) { continue; } 
+
+            // Como excluímos tudo, agora fazemos apenas INSERT para os itens válidos
+            $sql_item = "INSERT INTO itens_receita 
+                         (receita_id, medicamento_nome, concentracao, quantidade_total, posologia) 
+                         VALUES ('$receita_id', '$nome_seguro', '$concentracao_seguro', '$quantidade_seguro', '$posologia_seguro')";
+            
+            if (!mysqli_query($conexao, $sql_item)) {
+                $sucesso_itens = false;
+            }
+        }
+        
+        //  Resultado Final
+        if ($sucesso_itens) {
+            $_SESSION['mensagem'] = "Receita #$receita_id atualizada com sucesso!";
+            header('Location: ../view/receita-view.php?id=' . $receita_id);
+            exit;
+        } else {
+            $_SESSION['mensagem'] = "Receita principal atualizada, mas houve um erro ao salvar os itens. Erro: " . mysqli_error($conexao);
+            header('Location: ../view/receitas.php');
+            exit;
+        }
+    }
+
+    // --- LÓGICA DE LOGIN ---
     if(isset($_POST['login_usuario'])){
         $email = mysqli_real_escape_string($conexao, $_POST['email'] ?? '');
         $registro = mysqli_real_escape_string($conexao, $_POST['registro'] ?? '');
@@ -236,11 +309,11 @@
 
         $sql = "";
 
-        // 1. Tenta logar usando Email (login padrão)
+        //  Tenta logar usando Email (login padrão)
         if (!empty($email)) {
             $sql = "SELECT * FROM usuarios WHERE email = '$email'";
         } 
-        // 2. Tenta logar usando CRM/COREN (login de profissional/admin)
+        //  Tenta logar usando CRM/COREN (login de profissional/admin)
         else if (!empty($registro)) {
             $sql = "SELECT * FROM usuarios WHERE crm_registro = '$registro' OR coren_registro = '$registro'";
         } else {
@@ -292,7 +365,7 @@
     }
 
 
-    // --- 5. LÓGICA DE LOGOUT ---
+    // --- LÓGICA DE LOGOUT ---
     if(isset($_GET['logout'])){
         // Não precisa de session_start() aqui pois já está no topo, mas é boa prática se fosse um arquivo isolado
         session_unset(); // Limpa todas as variáveis de sessão
