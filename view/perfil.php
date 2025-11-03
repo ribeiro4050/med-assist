@@ -1,11 +1,35 @@
 <?php 
     session_start();
-    require '../Model/conexao.php';
+    require '../Model/conexao.php'; // Caminho corrigido para o arquivo de conexão
 
     // Redireciona se o usuário não estiver logado
     if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
-        header('Location: tela-login.php');
+        // Redireciona para login.php 
+        header('Location: login.php'); 
         exit;
+    }
+
+    // Pega as informações de sessão do usuário logado
+    $usuario_id = $_SESSION['id_usuario']; 
+    $role_usuario = $_SESSION['role_usuario'];
+    
+    // Busca dos dados do Perfil
+    $sql_perfil = "SELECT * FROM usuarios WHERE id = $usuario_id";
+    $query_perfil = mysqli_query($conexao, $sql_perfil);
+    $usuario = mysqli_fetch_array($query_perfil);
+
+    // variável da consulta de receitas
+    $query_receitas = null;
+
+    // Busca das receitas do paciente logado
+    if ($role_usuario === 'paciente') {
+        $sql_receitas = "SELECT r.id, r.data_prescricao, r.tipo_receita, m.nome AS nome_medico, m.crm_registro
+                         FROM receitas r
+                         JOIN usuarios m ON r.medico_id = m.id
+                         WHERE r.paciente_id = $usuario_id
+                         ORDER BY r.data_prescricao DESC"; // em ordem descrescente para pegar as receitas mais recentes primeiro
+                         
+        $query_receitas = mysqli_query($conexao, $sql_receitas);
     }
 ?>
 <!doctype html>
@@ -14,8 +38,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Perfil do Usuário</title>
+    <link rel="icon" type="image/png" href="../img/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  </head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"></head>
   <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-5">
@@ -29,13 +54,7 @@
                     </div>
                     <div class="card-body">
                         <?php 
-                            $usuario_id = mysqli_real_escape_string($conexao, $_SESSION['id_usuario']);
-
-                            $sql = "SELECT * FROM usuarios WHERE id = $usuario_id";
-                            $query = mysqli_query($conexao, $sql);
-
-                            if(mysqli_num_rows($query) > 0){
-                                $usuario = mysqli_fetch_array($query);
+                            if($usuario){ // Verifica se o array do usuário foi carregado
                         ?>
                             <div class="mb-3">
                                 <label for="">Nome</label>
@@ -62,6 +81,53 @@
                         ?>
                     </div>
                 </div>
+
+                <?php 
+                    // Verifica se o usuário é um paciente e se a consulta foi executada
+                   if ($role_usuario === 'paciente' && $query_receitas !== false): 
+                ?>
+                <div class="card mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Histórico de Receituários</h4>
+                    </div>
+                    <div class="card-body">
+                        <?php if (mysqli_num_rows($query_receitas) > 0): ?>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Data de Emissão</th>
+                                    <th>Tipo</th>
+                                    <th>Prescrito por</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while($receita = mysqli_fetch_array($query_receitas)): ?>
+                                <tr>
+                                    <td><?= $receita['id']?></td>
+                                    <td><?= date('d/m/Y', strtotime($receita['data_prescricao']))?></td>
+                                    <td><?= $receita['tipo_receita']?></td>
+                                    <td><?= $receita['nome_medico']?> (CRM: <?= $receita['crm_registro']?>)</td>
+                                    <td>
+                                        <a href="receita-view.php?id=<?= $receita['id']?>" class="btn btn-secondary btn-sm">
+                                            <span class="bi-eye-fill"></span> Visualizar
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                        <?php else: ?>
+                            <div class="alert alert-info">
+                                Nenhuma receita encontrada no seu histórico.
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <?php endif; ?>
+                
             </div>
         </div>
     </div>

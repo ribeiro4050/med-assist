@@ -8,6 +8,7 @@ require_once 'navbar.php';
 <head>
     <meta charset="UTF-8">
     <title>Histórico de <?= htmlspecialchars($nome_paciente) ?> - MedAssist</title> 
+    <link rel="icon" type="image/png" href="../img/logo.png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         /* ... Seu CSS da Timeline ... */

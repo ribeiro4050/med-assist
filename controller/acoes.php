@@ -367,7 +367,7 @@
 
     // --- LÓGICA DE LOGOUT ---
     if(isset($_GET['logout'])){
-        // Não precisa de session_start() aqui pois já está no topo, mas é boa prática se fosse um arquivo isolado
+        // Não precisa de session_start() aqui pq já ta no topo, mas seria uma boa prática se fosse um arquivo isolado
         session_unset(); // Limpa todas as variáveis de sessão
         session_destroy(); // Destrói a sessão
         $_SESSION['mensagem'] = "Sessão encerrada com sucesso.";

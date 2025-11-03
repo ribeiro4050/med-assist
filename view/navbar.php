@@ -1,6 +1,9 @@
 <nav class="navbar navbar-dark bg-dark">
     <div class="container-md d-flex justify-content-between">
-        <a href="index.php" class="navbar-brand">MedAssist</a>
+        <a href="index.php" class="navbar-brand">
+            <img src="../img/logo.png" alt="Logo MedAssist" style="height: 30px; margin-right: 8px;"> 
+            MedAssist
+        </a>
         <?php if(isset($_SESSION['logado']) && $_SESSION['logado'] === true): ?>
             <ul class="navbar-nav d-flex flex-row align-items-center">
                 
@@ -13,7 +16,7 @@
                 <?php endif; ?>
                 
                 <li class="nav-item me-3">
-                    <a href="acoes.php?logout=true" class="btn btn-sm btn-outline-danger">Sair</a>
+                    <a href="../controller/acoes.php?logout=true" class="btn btn-sm btn-outline-danger">Sair</a>
                 </li>
                 <li class="nav-item">
                     <a href="perfil.php" class="nav-link">
