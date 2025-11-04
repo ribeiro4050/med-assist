@@ -1,7 +1,8 @@
-<nav class="navbar navbar-dark bg-dark">
+ <!-- py-0 tira o padding vertical -->
+  <nav class="navbar navbar-dark bg-dark py-0">
     <div class="container-md d-flex justify-content-between">
         <a href="index.php" class="navbar-brand">
-            <img src="../img/logo.png" alt="Logo MedAssist" style="height: 30px; margin-right: 8px;"> 
+            <img src="../img/logo.png" alt="Logo MedAssist" style="height: 50px; margin-bottom: 4px" > 
             MedAssist
         </a>
         <?php if(isset($_SESSION['logado']) && $_SESSION['logado'] === true): ?>

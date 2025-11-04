@@ -352,13 +352,13 @@
                 
             } else {
                 // Senha incorreta
-                $_SESSION['mensagem'] = "Senha incorreta.";
+                $_SESSION['mensagem'] = "Usuario e /ou senha inválidos.";
                 header('Location: ../view/login.php');
                 exit;
             }
         } else {
             // Usuário não encontrado
-            $_SESSION['mensagem'] = "Credenciais não encontradas. Verifique o Email ou o Registro.";
+            $_SESSION['mensagem'] = "Usuario e /ou senha inválidos.";
             header('Location: ../view/login.php');
             exit;
         }
