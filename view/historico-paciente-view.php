@@ -51,35 +51,57 @@ require_once 'navbar.php';
         <div class="col-md-10 offset-md-1">
             <h2 class="mb-4">Histórico Clínico de <span class="text-primary"><?= htmlspecialchars($nome_paciente) ?></span></h2>
             <hr>
-            <!-- comentar -->
+            
+            <!-- Verifica se existe o historico/ se a variavel está vazia, printa a mensagem -->
             <?php if (empty($historico)): ?>
                 <div class="alert alert-info">
                     Nenhum registro de atendimento, exame ou diagnostico encontrado para este paciente.
                 </div>
-            <?php else: ?>
+
+            <?php else: ?>  
                 <ul class="timeline">
+
+                <!-- looping PRINCIPAL: itera cada item/$evento dentro do array "$historico" -->
                     <?php foreach ($historico as $evento): 
+
+                        // Adiciona um sufixo a evento ex: "evento-exame" ou "evento-diagnostico"
+                        // strtolower para deixar minusculo
+                        // str_replace para trocar espaço por hífene e adicionar o tipo de evento no final, ele acha o espaço em branco e adcione o "-" dai depois coloca o tipo_evento no final sintaxe: str_replace( $search, $replace, $subject );
                         $classe_css = strtolower(str_replace(' ', '-', $evento['tipo_evento']));
-                        // coloque 'data' do Model (que é um alias)
-                        $data_formatada = date('d/m/Y', strtotime($evento['data'])); 
-                        $titulo_evento = $evento['tipo_evento'];
+
+
+                        // Formata a data para o padrão brasileiro
+                        $data_formatada = date('d/m/Y', strtotime($evento['data'])); //"$evento['data']" pega o valor de 'data' que vem lá do model e está no formato do Banco de dados. "strtotime" converte a string data do data base para segundos. E date('d/m/Y',...) converte para o formato brasileiro
+                        $titulo_evento = $evento['tipo_evento']; 
                         $detalhes = "";
 
                         // Define os detalhes a serem exibidos com base no tipo
                         if ($evento['tipo_evento'] == 'Exame') {
+
+                            // htmlspecialchars -> para evitar XSS (Cross site Scripting), que é uma vulnerabilidade de segurança. É Basicamente uma proteção para que outros usarios não insiram scripts maliciosos na pag de outros usuarios.
+                            // n12br -> é responsavel pela formatação de quebras de linha, transforma enter em <br>
                             $detalhes = "Tipo: " . htmlspecialchars($evento['tipo']) . "<br>Resultado: " . nl2br(htmlspecialchars($evento['resultado']));
                         
-                        } elseif ($evento['tipo_evento'] == 'diagnostico') {
+                        } 
+                        
+                        elseif ($evento['tipo_evento'] == 'diagnostico') {
                             $detalhes = "CID-10: " . htmlspecialchars($evento['cid_10']) . 
                                         "<br>Descrição: " . nl2br(htmlspecialchars($evento['descricao'])) .
                                         "<br>Previsão: " . htmlspecialchars($evento['resultadoPrevisto']) . 
                                         " (Probabilidade: " . htmlspecialchars($evento['probabilidade']) . "%)";
                         
-                        } elseif ($evento['tipo_evento'] == 'Receita') {
-                            // Itera sobre a nova chave 'itens' para mostrar os medicamentos
+                        }
+
+
+                        // Itera sobre a nova chave 'itens' para mostrar os medicamentos e suas especificações
+                        elseif ($evento['tipo_evento'] == 'Receita') {
+                            
+                            // $detalhes agora é uma lista não ordenada
                             $detalhes = "<ul class='list-unstyled mb-0'>";
+
                             if (!empty($evento['itens'])) {
-                                foreach ($evento['itens'] as $item) {
+                                foreach ($evento['itens'] as $item) { // Percorre o array de itens da receita
+                                    // ".=" faz uma concatenação, vai adcionando mais informação a variavel $detalhes
                                     $detalhes .= "<li><strong>Medicamento:</strong> " . htmlspecialchars($item['medicamento_nome']) . "</li>";
                                     $detalhes .= "<li><strong>Concentração:</strong> " . htmlspecialchars($item['concentracao']) . "</li>";
                                     $detalhes .= "<li><strong>Posologia:</strong> " . nl2br(htmlspecialchars($item['posologia'])) . "</li><hr class='my-1'>";
@@ -93,6 +115,8 @@ require_once 'navbar.php';
                         <li class="timeline-item evento-<?= $classe_css ?>">
                             <div class="card shadow-sm">
                                 <div class="card-body">
+                                    
+                                <!--Usa Operado ternario(if-else) pra dar um destaque visual ao Diagnostico mudano a cor dependedo se for danger(verdadeiro) ou primary(falso)    -->
                                     <h5 class="card-title text-<?= ($evento['tipo_evento'] == 'diagnostico' ? 'danger' : 'primary') ?>">
                                         <?= $titulo_evento ?> 
                                         <small class="text-muted float-right">

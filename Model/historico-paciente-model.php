@@ -3,17 +3,20 @@
 
 // Busca todos os itens (medicamentos) de uma receita específica.
 
+// $conexao é o obejto que representa a conexão com o BD 
 function buscarItensReceita($conexao, $receita_id) {
     $itens = [];
-    $sql = "SELECT medicamento_nome, concentracao, posologia 
-            FROM itens_receita WHERE receita_id = ?";
 
-// comentar 
-    if ($stmt = mysqli_prepare($conexao, $sql)) {
-        mysqli_stmt_bind_param($stmt, "i", $receita_id);
-        mysqli_stmt_execute($stmt);
-        $resultado = mysqli_stmt_get_result($stmt);
-        while ($linha = mysqli_fetch_assoc($resultado)) {
+    // $sql -> variavel q armazena uma string com as infos do comando SQL
+    $sql = "SELECT medicamento_nome, concentracao, posologia 
+            FROM itens_receita WHERE receita_id = ?";// ? -> é um placeholder para evitar SQL Injection
+
+    
+    if ($stmt = mysqli_prepare($conexao, $sql)) { //pega a conexao e a query SQL envia pro BD e prepara a execução
+        mysqli_stmt_bind_param($stmt, "i", $receita_id);//liga variáveis ao parâmetros de uma instrução SQL|vincula o valor do ID da receita ao placeholder '?'|"i" indica que é um inteiro
+        mysqli_stmt_execute($stmt);//executa a query 
+        $resultado = mysqli_stmt_get_result($stmt); //pega o resultado da query 
+        while ($linha = mysqli_fetch_assoc($resultado)) { // mysqli_fetch_assoc -> busca uma linha do resultado como um array associativo
             $itens[] = $linha;
         }
         mysqli_stmt_close($stmt);
@@ -21,7 +24,7 @@ function buscarItensReceita($conexao, $receita_id) {
     return $itens;
 }
 
-// Busca o nome de um paciente pelo seu ID na tabela 'usuarios'
+// Busca o NOME de um paciente pelo seu ID na tabela 'usuarios'
 
 function buscarNomePaciente($conexao, $paciente_id) {
     // Busca na tabela 'usuarios' e verifica o role='paciente'
@@ -49,10 +52,9 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
     
     $historico_combinado = []; 
     
-    // Buscar Exames
+    // Buscar Historico de Exames
 
-    // comentar
-    $sql_exames = "SELECT *, data, 'Exame' AS tipo_evento FROM exame WHERE paciente_id = ? ORDER BY data DESC";
+    $sql_exames = "SELECT *, data, 'Exame' AS tipo_evento FROM exame WHERE paciente_id = ? ORDER BY data DESC"; //Desc = decrescente
     if ($stmt_exames = mysqli_prepare($conexao, $sql_exames)) {
         mysqli_stmt_bind_param($stmt_exames, "i", $paciente_id);
         mysqli_stmt_execute($stmt_exames);
@@ -63,8 +65,7 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
         mysqli_stmt_close($stmt_exames);
     }
     
-    // comentar
-    $sql_diagnosticos = "SELECT *, data, 'Diagnóstico' AS tipo_evento FROM diagnostico WHERE paciente_id = ? ORDER BY data DESC";
+    $sql_diagnosticos = "SELECT *, data, 'diagnostico' AS tipo_evento FROM diagnostico WHERE paciente_id = ? ORDER BY data DESC";
     if ($stmt_diagnosticos = mysqli_prepare($conexao, $sql_diagnosticos)) {
         mysqli_stmt_bind_param($stmt_diagnosticos, "i", $paciente_id);
         mysqli_stmt_execute($stmt_diagnosticos);
@@ -78,7 +79,6 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
     // Buscar Receitas (e seus itens)
 
     $sql_receitas = "SELECT id, data_prescricao AS data, 'Receita' AS tipo_evento FROM receitas WHERE paciente_id = ? ORDER BY data_prescricao DESC";
-    //  comenatr
     if ($stmt_receitas = mysqli_prepare($conexao, $sql_receitas)) {
         mysqli_stmt_bind_param($stmt_receitas, "i", $paciente_id);
         mysqli_stmt_execute($stmt_receitas);
@@ -93,9 +93,10 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
     }
 
     //Ordenar o Histórico Completo Cronologicamente (Mais recente primeiro)
+    // compara duas datas (B - A) para garantir que o mais recente venha sempre primeiro
     usort($historico_combinado, function($a, $b) {
-        // A ordenação deve ser baseada na data em formato UNIX (timestamp)
-        // O valor negativo inverte a ordem (para ser DESC)
+        // A ordenação e usa timestamp
+        // O valor negativo inverte a ordem (para ser decrescente)
         return strtotime($b['data']) - strtotime($a['data']);
     });
 
