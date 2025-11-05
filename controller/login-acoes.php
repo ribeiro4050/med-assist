@@ -1,4 +1,4 @@
-<?php
+<?php 
     session_start();
     require '../Model/conexao.php';
 
@@ -83,4 +83,4 @@
     header('Location: tela-login.php');
     exit;
 
-?>
+?>  

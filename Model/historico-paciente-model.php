@@ -1,13 +1,14 @@
 <?php
 
-/**
- * Busca todos os itens (medicamentos) de uma receita específica.
- */
+
+// Busca todos os itens (medicamentos) de uma receita específica.
+
 function buscarItensReceita($conexao, $receita_id) {
     $itens = [];
     $sql = "SELECT medicamento_nome, concentracao, posologia 
             FROM itens_receita WHERE receita_id = ?";
-    
+
+// comentar 
     if ($stmt = mysqli_prepare($conexao, $sql)) {
         mysqli_stmt_bind_param($stmt, "i", $receita_id);
         mysqli_stmt_execute($stmt);
@@ -20,11 +21,10 @@ function buscarItensReceita($conexao, $receita_id) {
     return $itens;
 }
 
-/**
- * Busca o nome de um paciente pelo seu ID na tabela 'usuarios'.
- */
+// Busca o nome de um paciente pelo seu ID na tabela 'usuarios'
+
 function buscarNomePaciente($conexao, $paciente_id) {
-    // ⚠️ CORREÇÃO CRÍTICA: Busca agora na tabela 'usuarios' e verifica o role='paciente'
+    // Busca na tabela 'usuarios' e verifica o role='paciente'
     $sql = "SELECT nome FROM usuarios WHERE id = ? AND role = 'paciente'"; 
     
     if ($stmt = mysqli_prepare($conexao, $sql)) {
@@ -42,17 +42,16 @@ function buscarNomePaciente($conexao, $paciente_id) {
     return "Paciente Não Encontrado";
 }
 
-/**
- * Busca o histórico completo de um paciente, combinando Exames, Diagnósticos e Receitas.
- */
+
+// Busca o histórico completo de um paciente, combinando Exames, Diagnósticos e Receitas.
+
 function buscarHistoricoCompleto($conexao, $paciente_id) {
     
     $historico_combinado = []; 
     
-    // ------------------------------------
-    // 1. Buscar Exames
-    // ------------------------------------
-    // ATENÇÃO: Use `exame` (minúsculo) conforme seu script SQL
+    // Buscar Exames
+
+    // comentar
     $sql_exames = "SELECT *, data, 'Exame' AS tipo_evento FROM exame WHERE paciente_id = ? ORDER BY data DESC";
     if ($stmt_exames = mysqli_prepare($conexao, $sql_exames)) {
         mysqli_stmt_bind_param($stmt_exames, "i", $paciente_id);
@@ -64,10 +63,7 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
         mysqli_stmt_close($stmt_exames);
     }
     
-    // ------------------------------------
-    // 2. Buscar Diagnósticos
-    // ------------------------------------
-    // ATENÇÃO: Use `diagnostico` (minúsculo) conforme seu script SQL
+    // comentar
     $sql_diagnosticos = "SELECT *, data, 'Diagnóstico' AS tipo_evento FROM diagnostico WHERE paciente_id = ? ORDER BY data DESC";
     if ($stmt_diagnosticos = mysqli_prepare($conexao, $sql_diagnosticos)) {
         mysqli_stmt_bind_param($stmt_diagnosticos, "i", $paciente_id);
@@ -79,11 +75,10 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
         mysqli_stmt_close($stmt_diagnosticos);
     }
     
-    // ------------------------------------
-    // 3. Buscar Receitas (e seus itens)
-    // ------------------------------------
+    // Buscar Receitas (e seus itens)
+
     $sql_receitas = "SELECT id, data_prescricao AS data, 'Receita' AS tipo_evento FROM receitas WHERE paciente_id = ? ORDER BY data_prescricao DESC";
-    
+    //  comenatr
     if ($stmt_receitas = mysqli_prepare($conexao, $sql_receitas)) {
         mysqli_stmt_bind_param($stmt_receitas, "i", $paciente_id);
         mysqli_stmt_execute($stmt_receitas);
@@ -97,9 +92,9 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
         mysqli_stmt_close($stmt_receitas);
     }
 
-    // 4. Ordenar o Histórico Completo Cronologicamente (Mais recente primeiro)
+    //Ordenar o Histórico Completo Cronologicamente (Mais recente primeiro)
     usort($historico_combinado, function($a, $b) {
-        // CORREÇÃO: A ordenação deve ser baseada na data em formato UNIX (timestamp)
+        // A ordenação deve ser baseada na data em formato UNIX (timestamp)
         // O valor negativo inverte a ordem (para ser DESC)
         return strtotime($b['data']) - strtotime($a['data']);
     });

@@ -10,8 +10,8 @@ require_once 'navbar.php';
     <title>Histórico de <?= htmlspecialchars($nome_paciente) ?> - MedAssist</title> 
     <link rel="icon" type="image/png" href="../img/logo.png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- jogar no arquivo style.css -->
     <style>
-        /* ... Seu CSS da Timeline ... */
         .timeline {
             border-left: 3px solid #dee2e6;
             background: #fff;
@@ -40,7 +40,7 @@ require_once 'navbar.php';
             border: 2px solid #fff;
         }
         .evento-exame:before { background: #28a745 !important; } 
-        .evento-diagnóstico:before { background: #dc3545 !important; } /* Atenção: use 'diagnóstico' com acento */
+        .evento-diagnostico:before { background: #dc3545 !important; } 
         .evento-receita:before { background: #ffc107 !important; } 
     </style>
 </head>
@@ -51,16 +51,16 @@ require_once 'navbar.php';
         <div class="col-md-10 offset-md-1">
             <h2 class="mb-4">Histórico Clínico de <span class="text-primary"><?= htmlspecialchars($nome_paciente) ?></span></h2>
             <hr>
-
+            <!-- comentar -->
             <?php if (empty($historico)): ?>
                 <div class="alert alert-info">
-                    Nenhum registro de atendimento, exame ou diagnóstico encontrado para este paciente.
+                    Nenhum registro de atendimento, exame ou diagnostico encontrado para este paciente.
                 </div>
             <?php else: ?>
                 <ul class="timeline">
                     <?php foreach ($historico as $evento): 
                         $classe_css = strtolower(str_replace(' ', '-', $evento['tipo_evento']));
-                        // Use 'data' do Model (que é um alias)
+                        // coloque 'data' do Model (que é um alias)
                         $data_formatada = date('d/m/Y', strtotime($evento['data'])); 
                         $titulo_evento = $evento['tipo_evento'];
                         $detalhes = "";
@@ -69,14 +69,14 @@ require_once 'navbar.php';
                         if ($evento['tipo_evento'] == 'Exame') {
                             $detalhes = "Tipo: " . htmlspecialchars($evento['tipo']) . "<br>Resultado: " . nl2br(htmlspecialchars($evento['resultado']));
                         
-                        } elseif ($evento['tipo_evento'] == 'Diagnóstico') {
+                        } elseif ($evento['tipo_evento'] == 'diagnostico') {
                             $detalhes = "CID-10: " . htmlspecialchars($evento['cid_10']) . 
                                         "<br>Descrição: " . nl2br(htmlspecialchars($evento['descricao'])) .
                                         "<br>Previsão: " . htmlspecialchars($evento['resultadoPrevisto']) . 
                                         " (Probabilidade: " . htmlspecialchars($evento['probabilidade']) . "%)";
                         
                         } elseif ($evento['tipo_evento'] == 'Receita') {
-                            // CORREÇÃO: Itera sobre a nova chave 'itens' para mostrar os medicamentos
+                            // Itera sobre a nova chave 'itens' para mostrar os medicamentos
                             $detalhes = "<ul class='list-unstyled mb-0'>";
                             if (!empty($evento['itens'])) {
                                 foreach ($evento['itens'] as $item) {
@@ -93,7 +93,7 @@ require_once 'navbar.php';
                         <li class="timeline-item evento-<?= $classe_css ?>">
                             <div class="card shadow-sm">
                                 <div class="card-body">
-                                    <h5 class="card-title text-<?= ($evento['tipo_evento'] == 'Diagnóstico' ? 'danger' : 'primary') ?>">
+                                    <h5 class="card-title text-<?= ($evento['tipo_evento'] == 'diagnostico' ? 'danger' : 'primary') ?>">
                                         <?= $titulo_evento ?> 
                                         <small class="text-muted float-right">
                                             <span class="badge badge-secondary"><?= $data_formatada ?></span>

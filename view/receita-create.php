@@ -150,27 +150,27 @@
             input.value = '';
         });
 
-        // 3. Limpa o espaço reservado e adiciona o botão de remover
+        // Limpa o espaço reservado e adiciona o botão de remover
         let removeBtnEspaco = newItem.querySelector('.remover-btn-espaco');
         removeBtnEspaco.innerHTML = ''; // Garante que o espaço está limpo antes de adicionar o botão
         
-        // 4. Cria o botão de remover
+        // Cria o botão de remover
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
-        // Usamos float-end para alinhar à direita dentro da div 'remover-btn-espaco'
+        // float-end para alinhar à direita dentro da div 'remover-btn-espaco'
         removeBtn.className = 'btn btn-danger btn-sm remove-item-btn float-end'; 
         removeBtn.innerHTML = '<span class="bi-trash3-fill"></span> Remover Item';
         
-        // 5. Adiciona a funcionalidade de remover
+        // Adiciona a funcionalidade de remover
         removeBtn.addEventListener('click', function() {
             // Remove o item pai (item-receita)
             newItem.remove(); 
         });
 
-        // 6. Adiciona o botão dentro do espaço reservado
+        // Adiciona o botão dentro do espaço reservado
         removeBtnEspaco.appendChild(removeBtn);
         
-        // 7. Adiciona o novo item ao container
+        // Adiciona o novo item ao container
         container.appendChild(newItem);
     });
     </script>
