@@ -37,7 +37,7 @@
 
         if($query) { 
             $_SESSION['mensagem'] = "Usuário criado com sucesso";
-            header('Location: ../view/index.php'); 
+            header('Location: ../view/lista-de-usuarios.php'); 
             exit;
         } else {
             $_SESSION['mensagem'] = "Usuário não foi criado. Erro: " . mysqli_error($conexao);
@@ -83,11 +83,11 @@
 
         if(mysqli_affected_rows($conexao) > 0){ 
             $_SESSION['mensagem'] = "Usuário atualizado com sucesso";
-            header('Location: ../view/index.php'); 
+            header('Location: ../view/lista-de-usuarios.php'); 
             exit;
         } else {
             $_SESSION['mensagem'] = "Nenhuma alteração feita ou Usuário não foi encontrado/atualizado. Erro: " . mysqli_error($conexao);
-            header('Location: ../view/index.php');
+            header('Location: ../view/lista-de-usuarios.php');
             exit;
         }
     }
@@ -102,11 +102,11 @@
 
         if(mysqli_affected_rows($conexao) > 0) {
             $_SESSION['mensagem'] = "Usuário deletado com sucesso";
-            header('Location: ../view/index.php');
+            header('Location: ../view/lista-de-usuarios.php');
             exit;
         } else {
             $_SESSION['mensagem'] = "Usuário não foi deletado. Erro: " . mysqli_error($conexao);
-            header('Location: ../view/index.php');
+            header('Location: ../view/lista-de-usuarios.php');
             exit;
         }
     }
@@ -347,7 +347,7 @@
                 $_SESSION['mensagem'] = "Bem-vindo(a), " . $usuario['nome'] . "! Seu nível de acesso é: " . strtoupper($usuario['role']);
 
                 // Redireciona para a página inicial (../view/index.php)
-                header('Location: ../view/index.php');
+                header('Location: ../view/lista-de-usuarios.php');
                 exit;
                 
             } else {
