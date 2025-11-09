@@ -91,7 +91,7 @@
                     <div class="card-header <?= $header_color ?> <?= $text_color ?>">
                         <h4 class="mb-0">
                             Receituário #<?= $receita_id ?> (<?= $receita['tipo_receita'] ?>)
-                            <a href="receitas.php" class="btn btn-light float-end">Voltar</a>
+                            <a href="javascript:history.go(-1)" class="btn btn-light float-end">Voltar</a>
                         </h4>
                     </div>
                     <div class="card-body p-5">

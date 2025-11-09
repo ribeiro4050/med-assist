@@ -18,7 +18,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4>Visualizar Usuario
-                            <a href="index.php" class="btn btn-danger float-end">Voltar</a>
+                            <a href="javascript:history.go(-1)" class="btn btn-danger float-end">Voltar</a>
                         </h4>
                     </div>
                     <div class="card-body">

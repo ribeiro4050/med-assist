@@ -1,6 +1,5 @@
 <?php 
-require_once 'navbar.php'; 
-
+include('navbar.php');
 ?>
 
 <!DOCTYPE html>
@@ -49,7 +48,8 @@ require_once 'navbar.php';
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-10 offset-md-1">
-            <h2 class="mb-4">Histórico Clínico de <span class="text-primary"><?= htmlspecialchars($nome_paciente) ?></span></h2>
+            <h2 class="mb-4">Histórico Clínico de <span class="text-primary"><?= htmlspecialchars($nome_paciente) ?></span>
+            </h2>
             <hr>
             
             <!-- Verifica se existe o historico/ se a variavel está vazia, printa a mensagem -->
@@ -134,7 +134,7 @@ require_once 'navbar.php';
             <?php endif; ?>
 
             <div class="text-center mt-4">
-                <a href="lista-pacientes.php" class="btn btn-secondary">Voltar para Pacientes</a>
+                <a href="javascript:history.go(-1)" class="btn btn-secondary mb-5">Voltar para Pacientes</a>
             </div>
         </div>
     </div>

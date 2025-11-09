@@ -40,6 +40,8 @@
           <div class="card">
             <div class="card-header">
               <h4> Minhas Receitas
+                <a href="javascript:history.go(-1)"class="btn btn-danger float-end ms-2">Voltar</a>
+
                 <a href="receita-create.php" class="btn btn-primary float-end">
                     <span class="bi-file-earmark-plus"></span> &nbsp; Nova Receita
                 </a>

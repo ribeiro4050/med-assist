@@ -48,7 +48,7 @@
       </ul>
       <div class="d-flex">
         <a href="index.php?page=login" class="btn btn-outline-primary me-2">Entrar</a>
-        <a href="#" class="btn btn-primary">Cadastrar</a>
+        <a href="../view/usuario-create.php" class="btn btn-primary">Cadastrar</a>
       </div>
     </div>
   </div>

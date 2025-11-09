@@ -371,8 +371,8 @@
         session_unset(); // Limpa todas as variáveis de sessão
         session_destroy(); // Destrói a sessão
         $_SESSION['mensagem'] = "Sessão encerrada com sucesso.";
-        // Redireciona para a tela de login
-        header('Location: ../view/login.php');
+        // Redireciona para a tela home
+        header('Location: ../view/index.php');
         exit;
     }
 
