@@ -8,7 +8,8 @@ include('navbar.php');
     <meta charset="UTF-8">
     <title>Histórico de <?= htmlspecialchars($nome_paciente) ?> - MedAssist</title> 
     <link rel="icon" type="image/png" href="../img/logo.png">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <!-- jogar no arquivo style.css -->
     <style>
         .timeline {
@@ -104,7 +105,7 @@ include('navbar.php');
                                     // ".=" faz uma concatenação, vai adcionando mais informação a variavel $detalhes
                                     $detalhes .= "<li><strong>Medicamento:</strong> " . htmlspecialchars($item['medicamento_nome']) . "</li>";
                                     $detalhes .= "<li><strong>Concentração:</strong> " . htmlspecialchars($item['concentracao']) . "</li>";
-                                    $detalhes .= "<li><strong>Posologia:</strong> " . nl2br(htmlspecialchars($item['posologia'])) . "</li><hr class='my-1'>";
+                                    $detalhes .= "<li><strong>Posologia:</strong> " . nl2br(htmlspecialchars($item['posologia'])) . "</li>";
                                 }
                             } else {
                                 $detalhes .= "<li>Nenhum item encontrado para esta receita.</li>";

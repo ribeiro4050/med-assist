@@ -23,7 +23,7 @@ USE `medassistdb`;
 
 DROP TABLE IF EXISTS `diagnostico`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET charagicter_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `diagnostico` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `paciente_id` int(11) NOT NULL COMMENT 'FK para Paciente (agora usuarios)',
@@ -101,7 +101,7 @@ CREATE TABLE `itens_receita` (
   PRIMARY KEY (`id`),
   KEY `receita_id` (`receita_id`),
   CONSTRAINT `itens_receita_ibfk_1` FOREIGN KEY (`receita_id`) REFERENCES `receitas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -110,7 +110,7 @@ CREATE TABLE `itens_receita` (
 
 LOCK TABLES `itens_receita` WRITE;
 /*!40000 ALTER TABLE `itens_receita` DISABLE KEYS */;
-INSERT INTO `itens_receita` VALUES (12,5,'morfina','30 mg','30 comprimidos','tomar 1 comprimido a cada 4 horas'),(13,6,'Clonazepam','2mg','30 comprimidos','1 comprimido ao deitar'),(14,6,'fenobarbital','40mg/mL','1 frasco de 20 ml','2 a 3 mg/kg/dia em dose única ou fracionada. Em caso de dúvidas, consulte a bula'),(16,7,'Puran T4','100 mg','30 comprimidos','Tomar um comprimido de manha em jejum por no mínimo 4h, e ficar mais 20 min de jejum até tomar café');
+INSERT INTO `itens_receita` VALUES (13,6,'Clonazepam','2mg','30 comprimidos','1 comprimido ao deitar'),(14,6,'fenobarbital','40mg/mL','1 frasco de 20 ml','2 a 3 mg/kg/dia em dose única ou fracionada. Em caso de dúvidas, consulte a bula'),(16,7,'Puran T4','100 mg','30 comprimidos','Tomar um comprimido de manha em jejum por no mínimo 4h, e ficar mais 20 min de jejum até tomar café'),(18,9,'Cimegripe','500mg','30','Tomar 1 comprimido a cada 8h por 4 dias'),(19,9,'Doril','200 mg','4 Comprimidos 1/12h','Antes da Principal Refeição'),(26,10,'Doril','500mg','30','Tomar 1/12h por 15 dias'),(27,10,'Paracetamol','250mg','30, frasco de 15 mL','Tomar 1/dia por 5 dias');
 /*!40000 ALTER TABLE `itens_receita` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -133,7 +133,7 @@ CREATE TABLE `receitas` (
   KEY `paciente_id` (`paciente_id`),
   CONSTRAINT `receitas_ibfk_1` FOREIGN KEY (`medico_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `receitas_ibfk_2` FOREIGN KEY (`paciente_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -142,7 +142,7 @@ CREATE TABLE `receitas` (
 
 LOCK TABLES `receitas` WRITE;
 /*!40000 ALTER TABLE `receitas` DISABLE KEYS */;
-INSERT INTO `receitas` VALUES (1,8,3,'2025-11-01 12:30:20','Simples','ste medicamento não deve ser usado em caso de hipersensibilidade ao paracetamol ou a qualquer outro componente da fórmula'),(2,8,3,'2025-11-01 12:30:58','Simples','ste medicamento não deve ser usado em caso de hipersensibilidade ao paracetamol ou a qualquer outro componente da fórmula'),(3,8,4,'2025-11-01 12:33:34','Amarela',NULL),(5,9,10,'2025-11-01 13:35:45','Controle Especial','contraindicada em diversas situações, principalmente em casos de depressão respiratória pré-existente e obstruções gastrointestinais, como o íleo paralítico.'),(6,9,11,'2025-11-02 01:24:22','Azul','contraindicado para pacientes com hipersensibilidade (alergia) conhecida aos benzodiazepínicos, com comprometimento hepático (fígado) grave, ou com insuficiência respiratória grave. Também não deve ser usado em conjunto com álcool e outros depressores do sistema nervoso central.'),(7,9,11,'2025-11-03 11:35:52','Simples',NULL);
+INSERT INTO `receitas` VALUES (6,9,11,'2025-11-02 01:24:22','Azul','contraindicado para pacientes com hipersensibilidade (alergia) conhecida aos benzodiazepínicos, com comprometimento hepático (fígado) grave, ou com insuficiência respiratória grave. Também não deve ser usado em conjunto com álcool e outros depressores do sistema nervoso central.'),(7,9,11,'2025-11-03 11:35:52','Simples',NULL),(9,9,13,'2025-11-09 03:37:13','Simples','Gripe Aguda'),(10,16,13,'2025-11-09 04:08:27','Azul','Dor Aguda no joelho');
 /*!40000 ALTER TABLE `receitas` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -165,7 +165,7 @@ CREATE TABLE `usuarios` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `crm_registro` (`crm_registro`),
   UNIQUE KEY `coren_registro` (`coren_registro`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -174,7 +174,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (3,'Gustavo de novo','gustavo@gmail.com','2025-09-03','$2y$10$w59RUSoH0QKTl1OP6gjb7.oRj.oRvcCC/RQQBQF3BuH6qs3zuhBMG','paciente',NULL,NULL),(4,'teste','email@email.com','2012-12-12','$2y$10$LC5TTxybTRk53q7UujJm4eymmqEMqqyFPAbwDp/4AHN9.d04r/JrW','paciente',NULL,NULL),(8,'teste','123@123','2006-12-12','$2y$10$FAcJhgCoIWiLvfaK1XqTPu9FrLiMLnHAoMPSQN/lH5sfr.KrrsmBu','paciente',NULL,NULL),(9,'Auzio Varella','medico@medico','1943-05-03','$2y$10$KoF4rakY2UEe8pWD/LJFkOGlE/4BkS9Zb3FgkjTYJON3cbj83TCEe','medico','123456/SP',NULL),(10,'paciente teste','paciente@teste','2002-02-21','$2y$10$L0bXZfYKsc78rgg.ktMolujhR6eCcy6CkFs5vOqwjpA0kPNBW.qcq','paciente',NULL,NULL),(11,'Gustavo Ribeiro','riberinho4050@gmail.com','2006-03-11','$2y$10$I/eqa7/eIy1Mm7GerB5KoeLfrlIb.PCNJnFPuaLNBOCL13PJVv.ri','paciente',NULL,NULL),(12,'Natalia Torres','nat@luvloona','2006-07-25','$2y$10$JdhO0daWlWjaGF5O13f7IuAxtwheVhsd7aBQlQ2gnI0JmOOCGNgoK','paciente',NULL,NULL);
+INSERT INTO `usuarios` VALUES (9,'Auzio Varella','medico@medico','1943-05-03','$2y$10$KoF4rakY2UEe8pWD/LJFkOGlE/4BkS9Zb3FgkjTYJON3cbj83TCEe','medico','123456/SP',NULL),(11,'Gustavo Ribeiro','riberinho4050@gmail.com','2006-03-11','$2y$10$I/eqa7/eIy1Mm7GerB5KoeLfrlIb.PCNJnFPuaLNBOCL13PJVv.ri','paciente',NULL,NULL),(12,'Natalia Torres','nat@luvloona','2006-07-25','$2y$10$JdhO0daWlWjaGF5O13f7IuAxtwheVhsd7aBQlQ2gnI0JmOOCGNgoK','paciente',NULL,NULL),(13,'Renato Augusto ramos','Renato@augusto.2015','1991-07-02','$2y$10$KManS/bSHS9wqfZ4IPHZp.71XpkdRAlHO5fvl2LDL1Fm.2N5aCOeu','paciente',NULL,NULL),(15,'Luiz Otávio','luiz@otavio.com','2005-09-20','$2y$10$3vpHez3Z8CPeVK89vIl9T.4hdaOQAk70S5YugBOjh2NQ7aTdpClFS','paciente',NULL,NULL),(16,'Carlos Chagaz','chagaz@gmail.com','1961-11-08','$2y$10$yydVHZAemPyKCuuILhT4y.S1eRc3rvh8.cJlwV8A3qicX7RbiGnrG','medico','909090/SP',NULL);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -187,4 +187,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-04 20:10:43
+-- Dump completed on 2025-11-10  0:37:10

@@ -69,51 +69,61 @@
   </div>
 
   <!-- Cards de Serviços -->
-  <div class="container">
-    <div class="card-container">
-      <div class="card border-primary mb-3">
-        <div class="card-header bg-primary text-white text-center">
-          <i class="fas fa-calendar-check fa-2x mb-2"></i>
-          <h5 class="card-title">Agendamento Rápido</h5>
-        </div>
-        <div class="card-body text-primary">
-          <p class="card-text">Agende consultas e exames em poucos cliques, com confirmação imediata.</p>
-          <a href="#" class="btn btn-outline-primary btn-sm">Saiba mais</a>
+ <div class="container mt-5">
+    <div class="row g-4 justify-content-center"> 
+      
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card h-100 border-primary shadow-sm">
+          <div class="card-header bg-primary text-white text-center">
+            <i class="fas fa-calendar-check fa-2x mb-2"></i>
+            <h5 class="card-title">Agendamento Rápido</h5>
+          </div>
+          <div class="card-body text-primary">
+            <p class="card-text">Agende consultas e exames em poucos cliques, com confirmação imediata.</p>
+            <a href="#" class="btn btn-outline-primary btn-sm">Saiba mais</a>
+          </div>
         </div>
       </div>
       
-      <div class="card border-success mb-3">
-        <div class="card-header bg-success text-white text-center">
-          <i class="fas fa-user-md fa-2x mb-2"></i>
-          <h5 class="card-title">Especialistas</h5>
-        </div>
-        <div class="card-body text-success">
-          <p class="card-text">Acesso a mais de 500 especialistas em diversas áreas da medicina.</p>
-          <a href="#" class="btn btn-outline-success btn-sm">Saiba mais</a>
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card h-100 border-success shadow-sm">
+          <div class="card-header bg-success text-white text-center">
+            <i class="fas fa-user-md fa-2x mb-2"></i>
+            <h5 class="card-title">Especialistas</h5>
+          </div>
+          <div class="card-body text-success">
+            <p class="card-text">Acesso a mais de 500 especialistas em diversas áreas da medicina.</p>
+            <a href="#" class="btn btn-outline-success btn-sm">Saiba mais</a>
+          </div>
         </div>
       </div>
       
-      <div class="card border-info mb-3">
-        <div class="card-header bg-info text-white text-center">
-          <i class="fas fa-hospital fa-2x mb-2"></i>
-          <h5 class="card-title">Hospitais Parceiros</h5>
-        </div>
-        <div class="card-body text-info">
-          <p class="card-text">Rede credenciada com os melhores hospitais e clínicas da região.</p>
-          <a href="#" class="btn btn-outline-info btn-sm">Saiba mais</a>
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card h-100 border-info shadow-sm">
+          <div class="card-header bg-info text-white text-center">
+            <i class="fas fa-hospital fa-2x mb-2"></i>
+            <h5 class="card-title">Hospitais Parceiros</h5>
+          </div>
+          <div class="card-body text-info">
+            <p class="card-text">Rede credenciada com os melhores hospitais e clínicas da região.</p>
+            <a href="#" class="btn btn-outline-info btn-sm">Saiba mais</a>
+          </div>
         </div>
       </div>
 
-      <div class="card border-warning mb-3">
-        <div class="card-header bg-warning text-white text-center">
-          <i class="fas fa-clock fa-2x mb-2"></i>
-          <h5 class="card-title">Atendimento 24h</h5>
-        </div>
-        <div class="card-body text-warning">
-          <p class="card-text">Suporte completo a qualquer hora do dia para suas necessidades médicas.</p>
-          <a href="#" class="btn btn-outline-warning btn-sm">Saiba mais</a>
+      <div class="col-sm-12 col-md-6 col-lg-3">
+        <div class="card h-100 border-warning shadow-sm">
+          <div class="card-header bg-warning text-white text-center">
+            <i class="fas fa-clock fa-2x mb-2"></i>
+            <h5 class="card-title">Atendimento 24h</h5>
+          </div>
+          <div class="card-body text-warning">
+            <p class="card-text">Suporte completo a qualquer hora do dia para suas necessidades médicas.</p>
+            <a href="#" class="btn btn-outline-warning btn-sm">Saiba mais</a>
+          </div>
         </div>
       </div>
+      
     </div>
   </div>
 </div>
@@ -358,7 +368,7 @@
         <p class="lead mb-0">Cadastre-se agora e tenha acesso a todos os nossos serviços de forma rápida e segura.</p>
       </div>
       <div class="col-lg-4 text-lg-end">
-        <a href="#" class="btn btn-light btn-lg px-4">Começar Agora</a>
+        <a href="../view/login.php" class="btn btn-light btn-lg px-4">Começar Agora</a>
       </div>
     </div>
   </div>

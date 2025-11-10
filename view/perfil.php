@@ -51,12 +51,14 @@
                         
                         <h4>Meu Perfil
                             <a href="javascript:history.go(-1)"class="btn btn-danger float-end ms-2">Voltar</a>
-
+                            
+                            <?php if ($role_usuario === 'paciente'): ?>
                             <a href="../controller/historico-paciente-controller.php?id=<?= $usuario['id']?>" class="btn btn-secondary float-end ms-2">
                             <span class="bi bi-clipboard-data"></span> &nbsp;
                             <!--icone de papel-->
                             Histórico</a>
-                            
+                            <?php endif; ?>
+
                             <a href="usuario-edit.php?id=<?= $usuario['id']?>" class="btn btn-success float-end ms-2">
                             <span class="bi-pencil-fill"></span> &nbsp;
                             <!--icone de lapis-->

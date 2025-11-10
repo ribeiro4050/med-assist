@@ -4,11 +4,11 @@
 
     // Verificação de acesso
     // Verifica se o usuário está logado e se é médico (Comentar para manutenção)
-    // if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['role_usuario'] !== 'medico') {
-    //     $_SESSION['mensagem'] = "Acesso negado. Apenas médicos podem criar receituários.";
-    //     header('Location: index.php');
-    //     exit;
-    // }
+    if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['role_usuario'] !== 'medico') {
+        $_SESSION['mensagem'] = "Acesso negado. Apenas médicos podem criar receituários.";
+        header('Location: index.php');
+        exit;
+    }
 
       // O ID do médico logado será usado para filtrar as receitas
     $medico_id = $_SESSION['id_usuario'];
