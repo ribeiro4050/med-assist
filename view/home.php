@@ -63,7 +63,6 @@
       <p class="mb-5">Tenha acesso rápido a serviços médicos e atendimento especializado</p>
       <div class="d-flex flex-wrap justify-content-center gap-3">
         <a href="#" class="btn btn-primary btn-lg">Agendar Consulta</a>
-        <a href="#" class="btn btn-outline-light btn-lg">Saiba Mais</a>
       </div>
     </div>
   </div>
@@ -80,7 +79,6 @@
           </div>
           <div class="card-body text-primary">
             <p class="card-text">Agende consultas e exames em poucos cliques, com confirmação imediata.</p>
-            <a href="#" class="btn btn-outline-primary btn-sm">Saiba mais</a>
           </div>
         </div>
       </div>
@@ -93,7 +91,6 @@
           </div>
           <div class="card-body text-success">
             <p class="card-text">Acesso a mais de 500 especialistas em diversas áreas da medicina.</p>
-            <a href="#" class="btn btn-outline-success btn-sm">Saiba mais</a>
           </div>
         </div>
       </div>
@@ -106,7 +103,6 @@
           </div>
           <div class="card-body text-info">
             <p class="card-text">Rede credenciada com os melhores hospitais e clínicas da região.</p>
-            <a href="#" class="btn btn-outline-info btn-sm">Saiba mais</a>
           </div>
         </div>
       </div>
@@ -119,7 +115,6 @@
           </div>
           <div class="card-body text-warning">
             <p class="card-text">Suporte completo a qualquer hora do dia para suas necessidades médicas.</p>
-            <a href="#" class="btn btn-outline-warning btn-sm">Saiba mais</a>
           </div>
         </div>
       </div>
@@ -225,8 +220,7 @@
               <i class="fas fa-star-half-alt"></i>
               <span class="ms-1 text-muted">4.5</span>
             </div>
-            <a href="#" class="btn btn-outline-primary btn-sm">Ver especialidades</a>
-          </div>
+=          </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-3">
@@ -243,7 +237,6 @@
               <i class="far fa-star"></i>
               <span class="ms-1 text-muted">4.0</span>
             </div>
-            <a href="#" class="btn btn-outline-primary btn-sm">Ver especialidades</a>
           </div>
         </div>
       </div>
@@ -261,7 +254,6 @@
               <i class="fas fa-star"></i>
               <span class="ms-1 text-muted">5.0</span>
             </div>
-            <a href="#" class="btn btn-outline-primary btn-sm">Ver especialidades</a>
           </div>
         </div>
       </div>
@@ -279,7 +271,6 @@
               <i class="fas fa-star-half-alt"></i>
               <span class="ms-1 text-muted">4.5</span>
             </div>
-            <a href="#" class="btn btn-outline-primary btn-sm">Ver especialidades</a>
           </div>
         </div>
       </div>
