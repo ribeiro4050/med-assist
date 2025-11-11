@@ -62,7 +62,6 @@
       <p class="lead mb-4">Buscamos transformar a eficiência da assistência médica com tecnologia de ponta</p>
       <p class="mb-5">Tenha acesso rápido a serviços médicos e atendimento especializado</p>
       <div class="d-flex flex-wrap justify-content-center gap-3">
-        <a href="#" class="btn btn-primary btn-lg">Agendar Consulta</a>
       </div>
     </div>
   </div>
