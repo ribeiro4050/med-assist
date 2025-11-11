@@ -58,9 +58,9 @@
 <div class="primeira-parte">
   <div class="container">
     <div class="hero-content text-center text-white py-5">
-      <h1 class="display-4 fw-bold mb-4">Agendamento hospitalar simplificado para suas necessidades de saúde.</h1>
-      <p class="lead mb-4">Agende consultas facilmente com os melhores hospitais e médicos de confiança.</p>
-      <p class="mb-5">Tenha acesso rápido a serviços médicos e atendimento especializado.</p>
+      <h1 class="display-4 fw-bold mb-4">Bem-Vindo a MedAssit</h1>
+      <p class="lead mb-4">Buscamos transformar a eficiência da assistência médica com tecnologia de ponta</p>
+      <p class="mb-5">Tenha acesso rápido a serviços médicos e atendimento especializado</p>
       <div class="d-flex flex-wrap justify-content-center gap-3">
         <a href="#" class="btn btn-primary btn-lg">Agendar Consulta</a>
         <a href="#" class="btn btn-outline-light btn-lg">Saiba Mais</a>
@@ -152,7 +152,7 @@
         </div>
       </div>
       <div class="col-lg-6">
-        <img src="../img/img-home.avif" alt="Equipe MedAssit" class="img-fluid rounded shadow">
+        <img src="../img/home-2.png" alt="Equipe MedAssit" class="img-fluid rounded shadow">
       </div>
     </div>
   </div>
@@ -213,9 +213,9 @@
     <div class="row g-4">
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 border-0 shadow-sm">
-          <img src="../img/img-home.avif" class="card-img-top" alt="Hospital Central">
+          <img src="../img/sirio-libanes.png" class="card-img-top" alt="Hospital Sirio Libanes">
           <div class="card-body">
-            <h5 class="card-title">Hospital Central</h5>
+            <h5 class="card-title">Hospital SirioL ibanes</h5>
             <p class="card-text">Referência em cardiologia e oncologia com mais de 30 anos de atuação.</p>
             <div class="d-flex align-items-center text-warning mb-2">
               <i class="fas fa-star"></i>
@@ -231,7 +231,7 @@
       </div>
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 border-0 shadow-sm">
-          <img src="../img/img-home.avif" class="card-img-top" alt="Santa Casa">
+          <img src="../img/santa_casa.png" class="card-img-top" alt="Santa Casa">
           <div class="card-body">
             <h5 class="card-title">Santa Casa</h5>
             <p class="card-text">Atendimento humanizado em mais de 15 especialidades médicas.</p>
@@ -249,9 +249,9 @@
       </div>
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 border-0 shadow-sm">
-          <img src="../img/img-home.avif" class="card-img-top" alt="Hospital São Lucas">
+          <img src="../img/são_luiz.png" class="card-img-top" alt="Hospital São Luiz">
           <div class="card-body">
-            <h5 class="card-title">Hospital São Lucas</h5>
+            <h5 class="card-title">Hospital São Luiz</h5>
             <p class="card-text">Centro de excelência em ortopedia e medicina esportiva.</p>
             <div class="d-flex align-items-center text-warning mb-2">
               <i class="fas fa-star"></i>
@@ -267,9 +267,9 @@
       </div>
       <div class="col-md-6 col-lg-3">
         <div class="card h-100 border-0 shadow-sm">
-          <img src="../img/img-home.avif" class="card-img-top" alt="Instituto Médico">
+          <img src="../img/albert_eistein.png" class="card-img-top" alt="Hospital Albert Eistein">
           <div class="card-body">
-            <h5 class="card-title">Instituto Médico</h5>
+            <h5 class="card-title">Albert Eistein</h5>
             <p class="card-text">Especializado em diagnósticos por imagem e medicina preventiva.</p>
             <div class="d-flex align-items-center text-warning mb-2">
               <i class="fas fa-star"></i>
@@ -299,7 +299,7 @@
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-body p-4">
             <div class="d-flex align-items-center mb-3">
-              <img src="../img/img-home.avif" alt="Maria Silva" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+              <img src="../img/pessoa-1.png" alt="Maria Silva" class="rounded-circle me-3" style="width: 50px; height: 50px;">
               <div>
                 <h5 class="mb-0">Maria Silva</h5>
                 <div class="text-warning">
@@ -319,7 +319,7 @@
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-body p-4">
             <div class="d-flex align-items-center mb-3">
-              <img src="../img/img-home.avif" alt="João Santos" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+              <img src="../img/pessoa-2.png" alt="João Santos" class="rounded-circle me-3" style="width: 50px; height: 50px;">
               <div>
                 <h5 class="mb-0">João Santos</h5>
                 <div class="text-warning">
@@ -339,9 +339,9 @@
         <div class="card h-100 border-0 shadow-sm">
           <div class="card-body p-4">
             <div class="d-flex align-items-center mb-3">
-              <img src="../img/img-home.avif" alt="Ana Costa" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+              <img src="../img/pessoa-3.png" alt="Ana Costa" class="rounded-circle me-3" style="width: 50px; height: 50px;">
               <div>
-                <h5 class="mb-0">Ana Costa</h5>
+                <h5 class="mb-0">Vinicius Ferreiragi</h5>
                 <div class="text-warning">
                   <i class="fas fa-star"></i>
                   <i class="fas fa-star"></i>
@@ -390,7 +390,7 @@
               <i class="fas fa-map-marker-alt text-primary me-3 mt-1"></i>
               <div>
                 <h6>Endereço</h6>
-                <p class="text-muted mb-0">Av. Principal, 123 - Centro, São Paulo - SP</p>
+                <p class="text-muted mb-0">Av.Salgado Filho, 3501 - Vila Rio, Guarulhos - SP</p>
               </div>
             </div>
             <div class="d-flex align-items-start mb-3">
@@ -411,7 +411,7 @@
               <i class="fas fa-clock text-primary me-3 mt-1"></i>
               <div>
                 <h6>Horário de Atendimento</h6>
-                <p class="text-muted mb-0">Segunda a Sexta: 8h às 18h<br>Sábado: 8h às 12h</p>
+                <p class="text-muted mb-0">24h</p>
               </div>
             </div>
           </div>

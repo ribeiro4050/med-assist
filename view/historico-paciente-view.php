@@ -1,7 +1,3 @@
-<?php 
-include('navbar.php');
-?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -45,7 +41,9 @@ include('navbar.php');
     </style>
 </head>
 <body>
-
+<?php 
+include('navbar.php');
+?>
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-10 offset-md-1">
