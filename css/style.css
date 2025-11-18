@@ -1,5 +1,17 @@
 /* Pagina Home */
 
+@charset "UTF-8";
+
+* {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-sizing: border-box;
+}
+.tela-login{
+    position: absolute;
+    top: 20%;
+}
+
+
 /* 1. Reset Básico e Ajuste para o Navbar Fixo */
 body {
     margin: 0;

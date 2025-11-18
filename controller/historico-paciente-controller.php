@@ -7,12 +7,15 @@ require_once __DIR__ . '/../Model/historico-paciente-model.php';
 
 session_start();
 
-
 // RF011: LÓGICA DE SEGURANÇA (COMENTADA PARA TESTES)
 // Usuário deve estar logado E ser Médico ou Assistente
 // REMOVA OS COMENTÁRIOS DESTE BLOCO PARA ATIVAR A SEGURANÇA NOVAMENTE!
 
 // ----------------------------------------------------------------------
+
+// RF011: LÓGICA DE SEGURANÇA (COMENTADA PARA TESTES)
+// Usuário deve estar logado E ser Médico ou Assistente
+// REMOVA OS COMENTÁRIOS DESTE BLOCO PARA ATIVAR A SEGURANÇA NOVAMENTE
 
 /*
 if (!isset($_SESSION['usuario_logado']) || ($_SESSION['perfil'] != 'Medico' && $_SESSION['perfil'] != 'Assistente')) {
@@ -21,12 +24,21 @@ if (!isset($_SESSION['usuario_logado']) || ($_SESSION['perfil'] != 'Medico' && $
 }
 */
 
+
 // Inicializa variáveis para evitar o erro 'Undefined variable' na View
 $nome_paciente = "Paciente Desconhecido"; 
 $historico = []; 
 
 
 // === OBTER E VALIDAR O ID DO PACIENTE ===
+
+// GARANTIA DE VARIÁVEIS
+// Inicializa variáveis para evitar o erro 'Undefined variable' na View.
+
+$nome_paciente = "Paciente Desconhecido"; 
+$historico = []; 
+
+// Obter e Validar o ID do Paciente
 
 // isset -> verifica se a variavelexiste e não é nula
 // ! -> operador de negação, inverte o resultado da condição se é true vira false e vice versa
@@ -36,6 +48,10 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $paciente_id = (int)$_GET['id'];
 
+
+// Buscar o Nome Real do Paciente (Corrigido para buscar em 'usuarios')
+
+
 $nome_paciente = buscarNomePaciente($conexao, $paciente_id);
 
 
@@ -44,9 +60,11 @@ if ($nome_paciente == "Paciente Não Encontrado") {
     die("ERRO: Paciente com ID $paciente_id não encontrado ou não tem o perfil de paciente.");
 }
 
-// === BUSCAR O HISTÓRICO COMPLETO DO PACIENTE ===
+// Chamar a função do Model para buscar o histórico completo
+
 $historico = buscarHistoricoCompleto($conexao, $paciente_id);
 
+// Carregar a View que agora tem acesso a $nome_paciente e $historico)
 
 //   Carregar a View. a View agora tem acesso a $nome_paciente e $historico
 require_once '../view/historico-paciente-view.php';

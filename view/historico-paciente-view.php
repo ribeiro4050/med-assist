@@ -81,9 +81,7 @@ include('navbar.php');
                             // n12br -> é responsavel pela formatação de quebras de linha, transforma enter em <br>
                             $detalhes = "Tipo: " . htmlspecialchars($evento['tipo']) . "<br>Resultado: " . nl2br(htmlspecialchars($evento['resultado']));
                         
-                        } 
-                        
-                        elseif ($evento['tipo_evento'] == 'diagnostico') {
+                        } elseif ($evento['tipo_evento'] == 'diagnostico') {
                             $detalhes = "CID-10: " . htmlspecialchars($evento['cid_10']) . 
                                         "<br>Descrição: " . nl2br(htmlspecialchars($evento['descricao'])) .
                                         "<br>Previsão: " . htmlspecialchars($evento['resultadoPrevisto']) . 

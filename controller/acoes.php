@@ -12,20 +12,22 @@
         
         // Criptografia da Senha com um hash forte
         $senha_pura = trim($_POST['senha']);
+        // se a senha for vazia, devolve string vazia e evita erro no password_hash
         $senha_hash = !empty($senha_pura) ? mysqli_real_escape_string($conexao, password_hash($senha_pura, PASSWORD_DEFAULT)) : '';
         
-        // Novos campos para role e registro (assumindo 'paciente' como default se não for especificado)
+        // Novos campos para role e registro assumindo Paciente como default 
         $role = mysqli_real_escape_string($conexao, trim($_POST['role'] ?? 'paciente'));
         $crm_registro = mysqli_real_escape_string($conexao, trim($_POST['crm_registro'] ?? ''));
         $coren_registro = mysqli_real_escape_string($conexao, trim($_POST['coren_registro'] ?? ''));
 
-        // Validação básica para roles de profissionais
+        // Validação obrigatoria para logins de profissionais
         if (($role == 'medico' && empty($crm_registro)) || ($role == 'enfermeiro' && empty($coren_registro))) {
-            $_SESSION['mensagem'] = "O registro (CRM/COREN) é obrigatório para o role selecionado.";
+            $_SESSION['mensagem'] = "O registro (CRM/COREN) é obrigatório para o login selecionado.";
             header('Location: ../view/usuario-create.php'); 
             exit;
         }
 
+        // inserção no banco
         $sql = "INSERT INTO usuarios (nome, email, data_nascimento, senha, role, crm_registro, coren_registro) 
                 VALUES ('$nome', '$email', '$data_nascimento', '$senha_hash', '$role', ";
         
@@ -204,6 +206,7 @@
         $query_select = mysqli_query($conexao, $sql_select);
 
         // o mysqli_fetch_assoc retorna um array associativo com os dados da consulta e pula para a próxima linha
+        // diferente do mysqli_fetch_array que retorna um array numerico e associativo, o mysqli_fectch_assoc associa com a chave ao invés do indice numerico
         $receita = mysqli_fetch_assoc($query_select);
         
         if ($receita && $receita['medico_id'] != $medico_id_logado && $role != 'admin') {
@@ -214,7 +217,7 @@
 
         // Devido ao ON DELETE CASCADE:
         // Deletar a receita principal
-        // Os itens relacionados (itens_receita) serão deletados automaticamente.
+        // Os itens relacionados do itens_receita serão deletados automaticamente.
         $sql = "DELETE FROM receitas WHERE id = '$receita_id'";
 
         mysqli_query($conexao, $sql);

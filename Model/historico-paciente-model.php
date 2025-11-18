@@ -27,7 +27,7 @@ function buscarItensReceita($conexao, $receita_id) {
 // Busca o NOME de um paciente pelo seu ID na tabela 'usuarios'
 
 function buscarNomePaciente($conexao, $paciente_id) {
-    // Busca na tabela 'usuarios' e verifica o role='paciente'
+    // CORREÇÃO CRÍTICA: Busca agora na tabela 'usuarios' e verifica o role='paciente'
     $sql = "SELECT nome FROM usuarios WHERE id = ? AND role = 'paciente'"; 
     
     if ($stmt = mysqli_prepare($conexao, $sql)) {
@@ -45,9 +45,9 @@ function buscarNomePaciente($conexao, $paciente_id) {
     return "Paciente Não Encontrado";
 }
 
-
-// Busca o histórico completo de um paciente, combinando Exames, Diagnósticos e Receitas.
-
+/**
+ * Busca o histórico completo de um paciente, combinando Exames, diagnosticos e Receitas.
+ */
 function buscarHistoricoCompleto($conexao, $paciente_id) {
     
     $historico_combinado = []; 
@@ -65,6 +65,10 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
         mysqli_stmt_close($stmt_exames);
     }
     
+    // ------------------------------------
+    // 2. Buscar diagnosticos
+    // ------------------------------------
+    // ATENÇÃO: Use `diagnostico` (minúsculo) conforme seu script SQL
     $sql_diagnosticos = "SELECT *, data, 'diagnostico' AS tipo_evento FROM diagnostico WHERE paciente_id = ? ORDER BY data DESC";
     if ($stmt_diagnosticos = mysqli_prepare($conexao, $sql_diagnosticos)) {
         mysqli_stmt_bind_param($stmt_diagnosticos, "i", $paciente_id);
