@@ -1,6 +1,4 @@
 <?php
-    session_start();
-
     // Inclui o arquivo de mensagem para exibir alertas de erro ou sucesso
     include('../view/mensagem.php'); 
 ?>

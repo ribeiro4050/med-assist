@@ -2,6 +2,12 @@
 session_start();
 // inicia a sessão para usar variáveis de sessão, tanto para salvar quanto para ler, como no caso de exibir mensagens para o usuario, sem esse comando a sessão não funciona logo as mensagens de erro ou sucesso não aparecem  
 require '../Model/conexao.php';
+
+if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['role_usuario'] == 'paciente') {
+        $_SESSION['mensagem'] = "Acesso negado. Apenas funcionarios podem gerenciar pacientes.";
+        header('Location: home.php');
+        exit;
+    }
 ?>
 <!doctype html>
 <html lang="en">

@@ -1,3 +1,11 @@
+
+<?php 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+  include('mensagem.php'); 
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,7 +18,13 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-
+<?php
+if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
+    // Se logado (como paciente ou outro), usa a navbar dinâmica com botões de perfil/logout
+    include('navbar.php');
+} else { // else fechado na linha 63
+    // Se não logado, usa a navbar de marketing 
+?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="#">
@@ -53,6 +67,9 @@
     </div>
   </div>
 </nav>
+<?php
+} // Fim do if (isset($_SESSION['logado']))
+?>
 
 <!-- Hero Section -->
 <div class="primeira-parte">
@@ -219,7 +236,7 @@
               <i class="fas fa-star-half-alt"></i>
               <span class="ms-1 text-muted">4.5</span>
             </div>
-=          </div>
+          </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-3">

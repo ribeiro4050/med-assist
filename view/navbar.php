@@ -26,12 +26,13 @@
 
                 <?php if(isset($_SESSION['role_usuario']) && $_SESSION['role_usuario'] === 'paciente'): ?>
                 <li class="nav-item me-3">
-                    <a href="../controller/historico-paciente-controller.php?id=<?= $_SESSION['id_usuario']?>" class="btn btn-outline-light btn-sm">
+                    <a href="../controller/historico-paciente-controller.php?id=<?php echo $_SESSION['id_usuario']; ?>" class="btn btn-outline-light btn-sm">
                     <span class="bi bi-clipboard-data"></span> &nbsp;
-                    <!--icone de papel-->
                     Histórico</a>
                 </li>
                 <?php endif; ?>
+                
+                <?php // Verificação de role para o botão Histórico para evitar repetição, mantendo apenas o bloco de teste original. ?>
                 
                 <li class="nav-item me-3">
                     <a href="../controller/acoes.php?logout=true" class="btn btn-sm btn-outline-danger">Sair</a>

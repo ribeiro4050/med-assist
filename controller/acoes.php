@@ -349,10 +349,15 @@
 
                 $_SESSION['mensagem'] = "Bem-vindo(a), " . $usuario['nome'] . "! Seu nível de acesso é: " . strtoupper($usuario['role']);
 
-                // Redireciona para a página inicial (../view/index.php)
-                header('Location: ../view/lista-de-usuarios.php');
-                exit;
-                
+                if ($usuario['role'] === 'paciente') {
+                    // Redireciona pacientes para a home page
+                    header('Location: ../view/home.php'); 
+                    exit;
+                } else {
+                    // Redireciona médicos, admins e outros para a lista de usuários (CRUD)
+                    header('Location: ../view/lista-de-usuarios.php');
+                    exit;
+                }
             } else {
                 // Senha incorreta
                 $_SESSION['mensagem'] = "Usuario e /ou senha inválidos.";

@@ -131,7 +131,7 @@ include('navbar.php');
             <?php endif; ?>
 
             <div class="text-center mt-4">
-                <a href="javascript:history.go(-1)" class="btn btn-secondary mb-5">Voltar para Pacientes</a>
+                <a href="javascript:history.go(-1)" class="btn btn-secondary mb-5">Voltar</a>
             </div>
         </div>
     </div>
