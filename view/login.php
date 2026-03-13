@@ -1,6 +1,10 @@
 <?php
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
     // Inclui o arquivo de mensagem para exibir alertas de erro ou sucesso
-    include('../view/mensagem.php'); 
+    include('mensagem.php'); 
 ?>
 <!doctype html>
 <html lang="pt-br">

@@ -2,23 +2,25 @@
 
     session_start();
     require '../Model/conexao.php'; // Inclui a conexão com o banco de dados
+    require_once '../Model/AuthService.php'; // Inclui o serviço de autenticação para usar a função de login
+    $auth = new AuthService($conexao);
 
     // --- LÓGICA DE CRIAÇÃO (CREATE) ---
     if(isset($_POST['create_usuario'])){
-        // mysqli_real_escape_string e trim previnem SQL Injection e removem espaços
-        $nome = mysqli_real_escape_string($conexao, trim($_POST['nome']));
-        $email = mysqli_real_escape_string($conexao, trim($_POST['email']));
-        $data_nascimento = mysqli_real_escape_string($conexao, trim($_POST['data_nascimento']));
+      
+        $nome = filtrar_sql($_POST['nome']);
+        $email = filtrar_sql($_POST['email']);
+        $data_nascimento = filtrar_sql($_POST['data_nascimento']);
         
         // Criptografia da Senha com um hash forte
         $senha_pura = trim($_POST['senha']);
         // se a senha for vazia, devolve string vazia e evita erro no password_hash
-        $senha_hash = !empty($senha_pura) ? mysqli_real_escape_string($conexao, password_hash($senha_pura, PASSWORD_DEFAULT)) : '';
+        $senha_hash = !empty($senha_pura) ? filtrar_sql(password_hash($senha_pura, PASSWORD_DEFAULT)) : '';
         
         // Novos campos para role e registro assumindo Paciente como default 
-        $role = mysqli_real_escape_string($conexao, trim($_POST['role'] ?? 'paciente'));
-        $crm_registro = mysqli_real_escape_string($conexao, trim($_POST['crm_registro'] ?? ''));
-        $coren_registro = mysqli_real_escape_string($conexao, trim($_POST['coren_registro'] ?? ''));
+        $role = filtrar_sql($_POST['role'] ?? 'paciente');
+        $crm_registro = filtrar_sql($_POST['crm_registro'] ?? '');
+        $coren_registro = filtrar_sql($_POST['coren_registro'] ?? '');
 
         // Validação obrigatoria para logins de profissionais
         if (($role == 'medico' && empty($crm_registro)) || ($role == 'enfermeiro' && empty($coren_registro))) {
@@ -51,14 +53,14 @@
 
     // ---  LÓGICA DE ATUALIZAÇÃO (UPDATE) ---
     if(isset($_POST['update_usuario'])){
-        $usuario_id = mysqli_real_escape_string($conexao, $_POST['usuario_id']);
-        $nome = mysqli_real_escape_string($conexao, trim($_POST['nome']));
-        $email = mysqli_real_escape_string($conexao, trim($_POST['email']));
-        $data_nascimento = mysqli_real_escape_string($conexao, trim($_POST['data_nascimento']));
-        $senha = mysqli_real_escape_string($conexao, trim($_POST['senha']));
-        $role = mysqli_real_escape_string($conexao, trim($_POST['role'] ?? ''));
-        $crm_registro = mysqli_real_escape_string($conexao, trim($_POST['crm_registro'] ?? ''));
-        $coren_registro = mysqli_real_escape_string($conexao, trim($_POST['coren_registro'] ?? ''));
+        $usuario_id = filtrar_sql($_POST['usuario_id']);
+        $nome = filtrar_sql($_POST['nome']);
+        $email = filtrar_sql($_POST['email']);
+        $data_nascimento = filtrar_sql($_POST['data_nascimento']);
+        $senha = filtrar_sql($_POST['senha']);
+        $role = filtrar_sql($_POST['role'] ?? '');
+        $crm_registro = filtrar_sql($_POST['crm_registro'] ?? '');
+        $coren_registro = filtrar_sql($_POST['coren_registro'] ?? '');
 
 
         $sql = "UPDATE usuarios SET nome = '$nome', email = '$email', data_nascimento = '$data_nascimento'";
@@ -96,7 +98,7 @@
 
     // ---  LÓGICA DE EXCLUSÃO (DELETE) ---
     if(isset($_POST['delete_usuario'])){
-        $usuario_id = mysqli_real_escape_string($conexao, $_POST['delete_usuario']);
+        $usuario_id = filtrar_sql($_POST['delete_usuario']);
         
         $sql = "DELETE FROM usuarios WHERE id = '$usuario_id'";
 
@@ -116,10 +118,10 @@
     // --- CRIAÇÃO DE RECEITA ---
     if (isset($_POST['create_receita'])) {
         // Coleta e sanitização dos dados da Receita Principal
-        $medico_id = mysqli_real_escape_string($conexao, $_POST['medico_id']);
-        $paciente_id = mysqli_real_escape_string($conexao, $_POST['paciente_id']);
-        $tipo_receita = mysqli_real_escape_string($conexao, $_POST['tipo_receita']);
-        $observacoes = mysqli_real_escape_string($conexao, trim($_POST['observacoes'] ?? ''));
+        $medico_id = filtrar_sql($_POST['medico_id']);
+        $paciente_id = filtrar_sql($_POST['paciente_id']);
+        $tipo_receita = filtrar_sql($_POST['tipo_receita']);
+        $observacoes = filtrar_sql($_POST['observacoes'] ?? '');
         $data_prescricao = date('Y-m-d H:i:s'); // Define a data/hora atual da prescrição
 
         // Coleta dos arrays dos Itens de Receita
@@ -150,10 +152,10 @@
 
             // loop para inserir cada item de receita
             foreach ($medicamento_nomes as $key => $nome) {
-                $nome_seguro = mysqli_real_escape_string($conexao, trim($nome));
-                $concentracao_seguro = mysqli_real_escape_string($conexao, trim($concentracaos[$key]));
-                $quantidade_seguro = mysqli_real_escape_string($conexao, trim($quantidade_totais[$key]));
-                $posologia_seguro = mysqli_real_escape_string($conexao, trim($posologias[$key]));
+                $nome_seguro = filtrar_sql($nome);
+                $concentracao_seguro = filtrar_sql($concentracaos[$key]);
+                $quantidade_seguro = filtrar_sql($quantidade_totais[$key]);
+                $posologia_seguro = filtrar_sql($posologias[$key]);
 
                 // Validação de item (garantir que não há itens vazios se o usuário clonou mas não preencheu)
                 if (empty($nome_seguro) || empty($concentracao_seguro) || empty($quantidade_seguro) || empty($posologia_seguro)) {
@@ -194,7 +196,7 @@
 
     // --- EXCLUSÃO DE RECEITA ---
     if(isset($_POST['delete_receita'])){
-        $receita_id = mysqli_real_escape_string($conexao, $_POST['delete_receita']);
+        $receita_id = filtrar_sql($_POST['delete_receita']);
         $medico_id_logado = $_SESSION['id_usuario'];
         $role = $_SESSION['role_usuario'];
 
@@ -236,11 +238,11 @@
     // --- EDIÇÃO DE RECEITA ---
     if (isset($_POST['update_receita'])) {
         // coleta dos dados principais
-        $receita_id = mysqli_real_escape_string($conexao, $_POST['receita_id']);
-        $medico_id = mysqli_real_escape_string($conexao, $_POST['medico_id']); // Usado para validação de segurança
-        $paciente_id = mysqli_real_escape_string($conexao, $_POST['paciente_id']);
-        $tipo_receita = mysqli_real_escape_string($conexao, $_POST['tipo_receita']);
-        $observacoes = mysqli_real_escape_string($conexao, trim($_POST['observacoes'] ?? ''));
+        $receita_id = filtrar_sql($_POST['receita_id']);
+        $medico_id = filtrar_sql($_POST['medico_id']); // Usado para validação de segurança
+        $paciente_id = filtrar_sql($_POST['paciente_id']);
+        $tipo_receita = filtrar_sql($_POST['tipo_receita']);
+        $observacoes = filtrar_sql($_POST['observacoes'] ?? '');
 
         // Validação de acesso (Apenas o criador pode atualizar)
         if ($_SESSION['role_usuario'] !== 'admin' && $medico_id != $_SESSION['id_usuario']) {
@@ -274,10 +276,10 @@
         // Loop sobre os itens enviados
         foreach ($medicamento_nomes as $key => $nome) {
             
-            $nome_seguro = mysqli_real_escape_string($conexao, trim($nome));
-            $concentracao_seguro = mysqli_real_escape_string($conexao, trim($concentracaos[$key] ?? ''));
-            $quantidade_seguro = mysqli_real_escape_string($conexao, trim($quantidade_totais[$key] ?? ''));
-            $posologia_seguro = mysqli_real_escape_string($conexao, trim($posologias[$key] ?? ''));
+            $nome_seguro = filtrar_sql($nome);
+            $concentracao_seguro = filtrar_sql($concentracaos[$key] ?? '');
+            $quantidade_seguro = filtrar_sql($quantidade_totais[$key] ?? '');
+            $posologia_seguro = filtrar_sql($posologias[$key] ?? '');
 
             // Ignora itens incompletos ou vazios
             if (empty($nome_seguro)) { continue; } 
@@ -305,72 +307,34 @@
     }
 
     // --- LÓGICA DE LOGIN ---
-    if(isset($_POST['login_usuario'])){
-        $email = mysqli_real_escape_string($conexao, $_POST['email'] ?? '');
-        $registro = mysqli_real_escape_string($conexao, $_POST['registro'] ?? '');
-        $senha_digitada = mysqli_real_escape_string($conexao, $_POST['senha']);
+if (isset($_POST['login_usuario'])) {
+    // Usamos a sua função filtrar_sql() para os campos de texto
+    $email = filtrar_sql($_POST['email'] ?? '');
+    $registro = filtrar_sql($_POST['registro'] ?? '');
+    $senha = $_POST['senha']; // Senha pura para o password_verify interno
 
-        $sql = "";
+    // Chamamos o MÉTODO do nosso SERVIÇO
+    $resultado = $auth->autenticar($email, $registro, $senha);
 
-        //  Tenta logar usando Email (login padrão)
-        if (!empty($email)) {
-            $sql = "SELECT * FROM usuarios WHERE email = '$email'";
-        } 
-        //  Tenta logar usando CRM/COREN (login de profissional/admin)
-        else if (!empty($registro)) {
-            $sql = "SELECT * FROM usuarios WHERE crm_registro = '$registro' OR coren_registro = '$registro'";
-        } else {
-            $_SESSION['mensagem'] = "Preencha o Email ou o Registro (CRM/COREN).";
-            header('Location: ../view/login.php');
-            exit;
-        }
+    if ($resultado['sucesso']) {
+        $user = $resultado['dados'];
         
-        $query = mysqli_query($conexao, $sql);
+        // O Controller cuida apenas da SESSÃO e do REDIRECIONAMENTO
+        $_SESSION['logado'] = true;
+        $_SESSION['id_usuario'] = $user['id'];
+        $_SESSION['nome_usuario'] = $user['nome'];
+        $_SESSION['role_usuario'] = $user['role'];
+        $_SESSION['mensagem'] = "Bem-vindo(a), " . $user['nome'] . "!";
 
-        if(mysqli_num_rows($query) == 1){
-            $usuario = mysqli_fetch_array($query);
-            $hash_armazenado = $usuario['senha'];
-
-            // Verifica a senha usando o hash
-            if (password_verify($senha_digitada, $hash_armazenado)) {
-                
-                // Validação para login de profissional: se usou o campo registro, a role deve ser de profissional
-                if (!empty($registro) && !in_array($usuario['role'], ['medico', 'enfermeiro', 'admin'])) {
-                    $_SESSION['mensagem'] = "Acesso de profissional negado para este registro.";
-                    header('Location: ../view/login.php');
-                    exit;
-                }
-
-                // Login bem-sucedido: Armazena dados na sessão
-                $_SESSION['logado'] = true;
-                $_SESSION['id_usuario'] = $usuario['id'];
-                $_SESSION['nome_usuario'] = $usuario['nome'];
-                $_SESSION['role_usuario'] = $usuario['role']; // Salva o role do usuário
-
-                $_SESSION['mensagem'] = "Bem-vindo(a), " . $usuario['nome'] . "! Seu nível de acesso é: " . strtoupper($usuario['role']);
-
-                if ($usuario['role'] === 'paciente') {
-                    // Redireciona pacientes para a home page
-                    header('Location: ../view/home.php'); 
-                    exit;
-                } else {
-                    // Redireciona médicos, admins e outros para a lista de usuários (CRUD)
-                    header('Location: ../view/lista-de-usuarios.php');
-                    exit;
-                }
-            } else {
-                // Senha incorreta
-                $_SESSION['mensagem'] = "Usuario e /ou senha inválidos.";
-                header('Location: ../view/login.php');
-                exit;
-            }
-        } else {
-            // Usuário não encontrado
-            $_SESSION['mensagem'] = "Usuario e /ou senha inválidos.";
-            header('Location: ../view/login.php');
-            exit;
-        }
+        $url = ($user['role'] === 'paciente') ? '../view/home.php' : '../view/lista-de-usuarios.php';
+        header("Location: $url");
+        exit;
+    } else {
+        $_SESSION['mensagem'] = $resultado['erro'];
+        header('Location: ../view/login.php');
+        exit;
     }
+}
 
 
     // --- LÓGICA DE LOGOUT ---

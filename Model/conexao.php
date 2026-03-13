@@ -5,4 +5,10 @@
     define('DB', 'medassistdb'); // alterar para o nome do seu banco
 
     $conexao = mysqli_connect(HOST, USUARIO, SENHA, DB) or die('Não foi possível conectar');
+
+    function filtrar_sql($input) {
+    // mysqli_real_escape_string e trim previnem SQL Injection e removem espaços
+    global $conexao;
+    return mysqli_real_escape_string($conexao, trim($input));
+}
 ?>
