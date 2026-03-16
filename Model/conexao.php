@@ -1,14 +1,21 @@
 <?php  
-    define('HOST', 'localhost'); // alterar para o host do seu banco
-    define('USUARIO', 'root'); // alterar para o usuario do seu banco
-    define('SENHA', ''); // alterar para a senha do seu banco
-    define('DB', 'medassistdb'); // alterar para o nome do seu banco
+    // Configurações de Conexão - Aiven MySQL
+    // Copie os dados do painel do Aiven (Service Management -> Overview)
+    
+    define('HOST', 'med-assist-med-assist.g.aivencloud.com');
+    define('PORT', '13589');
+    define('USUARIO', 'avnadmin');
+    define('SENHA', 'AVNS_iNJTi_85-Lp302IwPsO');
+    define('DB', 'defaultdb');
 
-    $conexao = mysqli_connect(HOST, USUARIO, SENHA, DB) or die('Não foi possível conectar');
+    // A conexão precisa da porta para funcionar fora do localhost
+    $conexao = mysqli_connect(HOST, USUARIO, SENHA, DB, PORT);
 
-    function filtrar_sql($input) {
-    // mysqli_real_escape_string e trim previnem SQL Injection e removem espaços
-    global $conexao;
-    return mysqli_real_escape_string($conexao, trim($input));
-}
+    // Verificação de segurança para o seu TCC
+    if (!$conexao) {
+        die("Erro de conexão: " . mysqli_connect_error());
+    }
+
+    // Garante que o PHP entenda caracteres especiais e acentos (UTF-8)
+    mysqli_set_charset($conexao, "utf8");
 ?>
