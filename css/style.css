@@ -165,6 +165,22 @@ footer a:hover {
     color: #fff !important;
 }
 
+/* Cor Laranja personalizada para o Protocolo de Manchester */
+.btn-orange {
+    background-color: #fd7e14; /* Cor laranja oficial do Bootstrap (variável interna) */
+    color: white;
+    border-color: #fd7e14;
+}
+
+.btn-outline-orange {
+    color: #fd7e14;
+    border-color: #fd7e14;
+}
+
+.btn-outline-orange:hover {
+    background-color: #fd7e14;
+    color: white;
+}
 /* Responsividade */
 @media (max-width: 768px) {
     body {
@@ -186,6 +202,7 @@ footer a:hover {
     .card {
         max-width: 100%;
     }
+    
 }
 
 /* Pagina historico-pacinete-view */

@@ -3,7 +3,13 @@
     session_start();
     require '../Model/conexao.php'; // Inclui a conexão com o banco de dados
     require_once '../Model/AuthService.php'; // Inclui o serviço de autenticação para usar a função de login
+    require_once '../Model/ReceitaService.php'; // Inclui o serviço de receita para usar a função de criação de receita
+    require_once '../Model/EnfermagemService.php'; // Inclui o serviço de enfermagem para usar a função de triagem
+
+    // Instancias de serviços:
     $auth = new AuthService($conexao);
+    $receitaService = new ReceitaService($conexao);
+    $enfermagemService = new EnfermagemService($conexao);
 
     // --- LÓGICA DE CRIAÇÃO (CREATE) ---
     if(isset($_POST['create_usuario'])){
@@ -116,83 +122,35 @@
     }
 
     // --- CRIAÇÃO DE RECEITA ---
-    if (isset($_POST['create_receita'])) {
-        // Coleta e sanitização dos dados da Receita Principal
-        $medico_id = filtrar_sql($_POST['medico_id']);
-        $paciente_id = filtrar_sql($_POST['paciente_id']);
-        $tipo_receita = filtrar_sql($_POST['tipo_receita']);
-        $observacoes = filtrar_sql($_POST['observacoes'] ?? '');
-        $data_prescricao = date('Y-m-d H:i:s'); // Define a data/hora atual da prescrição
+if (isset($_POST['create_receita'])) {
+    // Coleta dados da receita
+    $dados_receita = [
+        'medico_id' => filtrar_sql($_POST['medico_id']),
+        'paciente_id' => filtrar_sql($_POST['paciente_id']),
+        'tipo_receita' => filtrar_sql($_POST['tipo_receita']),
+        'observacoes' => filtrar_sql($_POST['observacoes'] ?? '')
+    ];
 
-        // Coleta dos arrays dos Itens de Receita
-        $medicamento_nomes = $_POST['medicamento_nome'];
-        $concentracaos = $_POST['concentracao'];
-        $quantidade_totais = $_POST['quantidade_total'];
-        $posologias = $_POST['posologia'];
+    // Coleta arrays de itens (filtrando cada um)
+    $itens_receita = [
+        'nomes' => array_map('filtrar_sql', $_POST['medicamento_nome']),
+        'concentracoes' => array_map('filtrar_sql', $_POST['concentracao']),
+        'quantidades' => array_map('filtrar_sql', $_POST['quantidade_total']),
+        'posologias' => array_map('filtrar_sql', $_POST['posologia'])
+    ];
 
-        // Validação dos campos obrigatórios
-        if (empty($paciente_id) || empty($tipo_receita) || empty($medicamento_nomes) || count($medicamento_nomes) == 0) {
-            $_SESSION['mensagem'] = "Campos obrigatórios: Paciente e  Medicamento não foram preenchidos.";
-            header('Location: ../view/receita-create.php');
-            exit;
-        }
+    // Delega para o serviço
+    $resultado = $receitaService->criarReceita($dados_receita, $itens_receita);
 
-        // inserção da receita
-        // caso observações esteja vazio, insere NULL no banco
-        $sql_receita = "INSERT INTO receitas 
-                        (medico_id, paciente_id, data_prescricao, tipo_receita, observacoes) 
-                        VALUES ('$medico_id', '$paciente_id', '$data_prescricao', '$tipo_receita', 
-                        " . (empty($observacoes) ? "NULL" : "'$observacoes'") . ")";
-
-        if (mysqli_query($conexao, $sql_receita)) {
-            // obtem o id da receita criada
-            $receita_id = mysqli_insert_id($conexao);
-            $sucesso_itens = true;
-            $erros_itens = 0;
-
-            // loop para inserir cada item de receita
-            foreach ($medicamento_nomes as $key => $nome) {
-                $nome_seguro = filtrar_sql($nome);
-                $concentracao_seguro = filtrar_sql($concentracaos[$key]);
-                $quantidade_seguro = filtrar_sql($quantidade_totais[$key]);
-                $posologia_seguro = filtrar_sql($posologias[$key]);
-
-                // Validação de item (garantir que não há itens vazios se o usuário clonou mas não preencheu)
-                if (empty($nome_seguro) || empty($concentracao_seguro) || empty($quantidade_seguro) || empty($posologia_seguro)) {
-                    // Ignora itens incompletos, mas não interrompe o processo.
-                    continue; 
-                }
-
-                $sql_item = "INSERT INTO itens_receita 
-                             (receita_id, medicamento_nome, concentracao, quantidade_total, posologia) 
-                             VALUES ('$receita_id', '$nome_seguro', '$concentracao_seguro', '$quantidade_seguro', '$posologia_seguro')";
-                
-                if (!mysqli_query($conexao, $sql_item)) {
-                    $sucesso_itens = false;
-                    $erros_itens++;
-                }
-            }
-
-            // resultado da criação da receita
-            if ($sucesso_itens) {
-                $_SESSION['mensagem'] = "Receita e todos os itens prescritos com sucesso! ID: " . $receita_id;
-                header('Location: ../view/receitas.php?id=' . $receita_id); // Redireciona para a visualização
-                exit;
-            } else {
-                // Em caso de falha na inserção de itens, talvez seja necessário apagar a receita principal, 
-                // mas por agora, um alerta ja ta bom.
-                $_SESSION['mensagem'] = "Receita criada, mas falha ao inserir $erros_itens item(s) de medicamento. Erro: " . mysqli_error($conexao);
-                header('Location: ../view/receitas.php');
-                exit;
-            }
-
-        } else {
-            // Falha na inserção da receita principal
-            $_SESSION['mensagem'] = "Erro ao criar a Receita. Erro: " . mysqli_error($conexao);
-            header('Location: ../view/receita-create.php');
-            exit;
-        }
+    if ($resultado['sucesso']) {
+        $_SESSION['mensagem'] = "Receita prescrita com sucesso!";
+        header('Location: ../view/receitas.php?id=' . $resultado['id']);
+    } else {
+        $_SESSION['mensagem'] = "Erro ao criar receita: " . $resultado['erro'];
+        header('Location: ../view/receita-create.php');
     }
+    exit;
+}
 
     // --- EXCLUSÃO DE RECEITA ---
     if(isset($_POST['delete_receita'])){
@@ -305,36 +263,62 @@
             exit;
         }
     }
+    // --- LÓGICA DE CRIAÇÃO DE TRIAGEM ---
+    if (isset($_POST['create_triagem'])) {
+        $dados_triagem = [
+            'paciente_id'         => filtrar_sql($_POST['paciente_id']),
+            'enfermeiro_id'       => $_SESSION['id_usuario'], // Pega o ID de quem está logado
+            'queixa_principal'    => filtrar_sql($_POST['queixa_principal']),
+            'pressao_arterial'    => filtrar_sql($_POST['pressao_arterial']),
+            'temperatura'         => filtrar_sql($_POST['temperatura']),
+            'peso'                => filtrar_sql($_POST['peso']),
+            'altura'              => filtrar_sql($_POST['altura']),
+            'frequencia_cardiaca' => filtrar_sql($_POST['frequencia_cardiaca']),
+            'saturacao'           => filtrar_sql($_POST['saturacao']),
+            'classificacao_risco' => filtrar_sql($_POST['classificacao_risco'])
+        ];
 
-    // --- LÓGICA DE LOGIN ---
-if (isset($_POST['login_usuario'])) {
-    // Usamos a sua função filtrar_sql() para os campos de texto
-    $email = filtrar_sql($_POST['email'] ?? '');
-    $registro = filtrar_sql($_POST['registro'] ?? '');
-    $senha = $_POST['senha']; // Senha pura para o password_verify interno
+        $resultado = $enfermagemService->salvarTriagem($dados_triagem);
 
-    // Chamamos o MÉTODO do nosso SERVIÇO
-    $resultado = $auth->autenticar($email, $registro, $senha);
-
-    if ($resultado['sucesso']) {
-        $user = $resultado['dados'];
-        
-        // O Controller cuida apenas da SESSÃO e do REDIRECIONAMENTO
-        $_SESSION['logado'] = true;
-        $_SESSION['id_usuario'] = $user['id'];
-        $_SESSION['nome_usuario'] = $user['nome'];
-        $_SESSION['role_usuario'] = $user['role'];
-        $_SESSION['mensagem'] = "Bem-vindo(a), " . $user['nome'] . "!";
-
-        $url = ($user['role'] === 'paciente') ? '../view/home.php' : '../view/lista-de-usuarios.php';
-        header("Location: $url");
-        exit;
-    } else {
-        $_SESSION['mensagem'] = $resultado['erro'];
-        header('Location: ../view/login.php');
+        if ($resultado['sucesso']) {
+            $_SESSION['mensagem'] = "Triagem realizada com sucesso!";
+            header('Location: ../view/painel-enfermagem.php');
+        } else {
+            $_SESSION['mensagem'] = "Erro na triagem: " . $resultado['erro'];
+            header('Location: ../view/triagem-create.php');
+        }
         exit;
     }
-}
+
+    // --- LÓGICA DE LOGIN ---
+    if (isset($_POST['login_usuario'])) {
+        // Usamos a sua função filtrar_sql() para os campos de texto
+        $email = filtrar_sql($_POST['email'] ?? '');
+        $registro = filtrar_sql($_POST['registro'] ?? '');
+        $senha = $_POST['senha']; // Senha pura para o password_verify interno
+
+        // Chamamos o MÉTODO do nosso SERVIÇO
+        $resultado = $auth->autenticar($email, $registro, $senha);
+
+        if ($resultado['sucesso']) {
+            $user = $resultado['dados'];
+            
+            // O Controller cuida apenas da SESSÃO e do REDIRECIONAMENTO
+            $_SESSION['logado'] = true;
+            $_SESSION['id_usuario'] = $user['id'];
+            $_SESSION['nome_usuario'] = $user['nome'];
+            $_SESSION['role_usuario'] = $user['role'];
+            $_SESSION['mensagem'] = "Bem-vindo(a), " . $user['nome'] . "!";
+
+            $url = ($user['role'] === 'paciente') ? '../view/home.php' : '../view/lista-de-usuarios.php';
+            header("Location: $url");
+            exit;
+        } else {
+            $_SESSION['mensagem'] = $resultado['erro'];
+            header('Location: ../view/login.php');
+            exit;
+        }
+    }
 
 
     // --- LÓGICA DE LOGOUT ---
