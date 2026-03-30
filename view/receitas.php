@@ -82,20 +82,11 @@
                       <a href="receita-view.php?id=<?= $receita['id']?>" class="btn btn-secondary btn-sm">
                       <span class="bi-eye-fill"></span></a>
 
-                      <a href="receita-edit.php?id=<?= $receita['id']?>" class="btn btn-success btn-sm">
-                      <span class="bi-pencil-fill"></span></a>
-
                       <a href="../controller/EnviarReceitaController.php?id=<?= $receita['id'] ?>" 
                          class="btn btn-primary btn-sm" 
                          onclick="return confirm('Deseja enviar esta receita para o e-mail do paciente?')">
                          <span class="bi-envelope-at-fill"></span>
                       </a>
-
-                      <form action="../controller/acoes.php" method="post" class="d-inline">
-                        <button onclick="return confirm('Tem certeza que deseja excluir esta receita?')" type="submit" name="delete_receita" value="<?= $receita['id']?>" class="btn btn-danger btn-sm">
-                          <span class="bi-trash3-fill"></span>
-                        </button>
-                      </form>
                     </td>
                   </tr>
                   <?php 
