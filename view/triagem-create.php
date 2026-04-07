@@ -77,28 +77,32 @@
 
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
-                                    <label class="form-label">Pressão Arterial</label>
-                                    <input type="text" name="pressao_arterial" class="form-control" placeholder="Ex: 12/8">
+                                    <label class="form-label">Pressão Arterial (Sist./Diast.)</label>
+                                    <div class="input-group">
+                                        <input type="number" name="pressao_sistolica" class="form-control" placeholder="120" min="40" max="300" required>
+                                        <span class="input-group-text">/</span>
+                                        <input type="number" name="pressao_diastolica" class="form-control" placeholder="80" min="20" max="200" required>
+                                    </div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Temperatura (°C)</label>
-                                    <input type="number" step="0.1" name="temperatura" class="form-control" placeholder="Ex: 36.5">
+                                    <input type="number" step="0.1" name="temperatura" class="form-control" placeholder="Ex: 36.5" min= "0" max="45" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Altura (m)</label>
-                                    <input type="number" step="0.01" name="altura" class="form-control" placeholder="Ex: 1.75">
+                                    <input type="number" step="0.01" name="altura" class="form-control" placeholder="Ex: 1.75" min= "0.3" max="2.5" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Peso (kg)</label>
-                                    <input type="number" step="0.01" name="peso" class="form-control" placeholder="Ex: 70.0">
+                                    <input type="number" step="0.01" name="peso" class="form-control" placeholder="Ex: 70.0" min= "2" max="632.5" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Freq. Cardíaca (BPM)</label>
-                                    <input type="number" name="frequencia_cardiaca" class="form-control" placeholder="Ex: 80"> 
+                                    <input type="number" name="frequencia_cardiaca" class="form-control" placeholder="Ex: 80" min= "15" max="400" required> 
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Saturação (%)</label>
-                                    <input type="number" name="saturacao" class="form-control" placeholder="Ex: 98">
+                                    <input type="number" name="saturacao" class="form-control" placeholder="Ex: 98" min= "20" max="100" required>
                                 </div>
                             </div>
 

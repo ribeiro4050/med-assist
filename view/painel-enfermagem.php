@@ -16,7 +16,7 @@
 
     // 3. Inicialização do Serviço e Busca de Dados
     $enfermagemService = new EnfermagemService($conexao);
-    $query = $enfermagemService->listarTriagensRecentes(15); // Buscando as últimas 15
+    $query = $enfermagemService->listarTriagensRecentes(15); 
 ?>
 
 <!DOCTYPE html>
@@ -30,14 +30,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* Estilização das bordas coloridas baseadas na classificação */
         .border-Azul { border-left: 8px solid #0dcaf0 !important; }
         .border-Verde { border-left: 8px solid #198754 !important; }
         .border-Amarelo { border-left: 8px solid #ffc107 !important; }
         .border-Laranja { border-left: 8px solid #fd7e14 !important; }
         .border-Vermelho { border-left: 8px solid #dc3545 !important; }
 
-        /* Badges personalizadas para a tabela */
         .badge-manchester {
             width: 110px;
             padding: 8px;
@@ -54,17 +52,8 @@
 </head>
 <body class="bg-light">
 
-    <nav class="navbar navbar-dark bg-primary shadow-sm mb-4">
-        <div class="container">
-            <span class="navbar-brand mb-0 h1">
-                <i class="fas fa-heartbeat me-2"></i>MedAssist - Enfermagem
-            </span>
-            <div class="d-flex">
-                <span class="text-white me-3 d-none d-md-inline">Olá, <?= $_SESSION['nome_usuario']; ?></span>
-                <a href="logout.php" class="btn btn-sm btn-outline-light">Sair</a>
-            </div>
-        </div>
-    </nav>
+   <?php include('navbar.php'); ?>
+   <br>
 
     <div class="container">
         <div class="row">
@@ -93,13 +82,15 @@
                                     <?php if(mysqli_num_rows($query) > 0): ?>
                                         <?php while($triagem = mysqli_fetch_assoc($query)): 
                                             $cor = $triagem['classificacao_risco'];
-                                            // Lógica simples para cor do badge (Bootstrap nativo + nossa cor laranja)
                                             $badge_bg = ($cor == 'Laranja') ? 'style="background-color: #fd7e14; color: white;"' : '';
                                             $badge_class = 'badge ';
                                             if($cor == 'Azul') $badge_class .= 'bg-info text-dark';
                                             if($cor == 'Verde') $badge_class .= 'bg-success';
                                             if($cor == 'Amarelo') $badge_class .= 'bg-warning text-dark';
                                             if($cor == 'Vermelho') $badge_class .= 'bg-danger';
+
+                                            // Lógica para Data e Hora (usando a coluna nova data_hora)
+                                            $data_final = $triagem['data_hora'] ?? $triagem['data_criacao'] ?? 'now';
                                         ?>
                                             <tr class="border-<?= $cor; ?>">
                                                 <td class="ps-4">
@@ -107,13 +98,14 @@
                                                     <small class="text-muted">ID: #<?= $triagem['paciente_id']; ?></small>
                                                 </td>
                                                 <td>
-                                                    <span class="badge bg-light text-dark border">
-                                                        <i class="fas fa-tachometer-alt me-1 text-secondary"></i> <?= $triagem['pressao_arterial']; ?>
+                                                    <span class="badge bg-light text-dark border" title="Pressão Arterial">
+                                                    <i class="fas fa-tachometer-alt me-1 text-secondary"></i> 
+                                                    <?= $triagem['pressao_sistolica'] / 10; ?> / <?= $triagem['pressao_diastolica'] / 10; ?>
                                                     </span>
-                                                    <span class="badge bg-light text-dark border">
+                                                    <span class="badge bg-light text-dark border" title="Temperatura">
                                                         <i class="fas fa-thermometer-half me-1 text-danger"></i> <?= $triagem['temperatura']; ?>°C
                                                     </span>
-                                                    <span class="badge bg-light text-dark border">
+                                                    <span class="badge bg-light text-dark border" title="Saturação">
                                                         <i class="fas fa-fingerprint me-1 text-primary"></i> <?= $triagem['saturacao']; ?>%
                                                     </span>
                                                 </td>
@@ -123,8 +115,8 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <div class="small"><?= date('d/m/Y', strtotime($triagem['data_criacao'] ?? 'now')); ?></div>
-                                                    <div class="small text-muted"><?= date('H:i', strtotime($triagem['data_criacao'] ?? 'now')); ?></div>
+                                                    <div class="small"><?= date('d/m/Y', strtotime($data_final)); ?></div>
+                                                    <div class="small text-muted"><?= date('H:i', strtotime($data_final)); ?></div>
                                                 </td>
                                                 <td class="text-center">
                                                     <a href="triagem-view.php?id=<?= $triagem['id']; ?>" class="btn btn-sm btn-outline-secondary" title="Ver Detalhes">

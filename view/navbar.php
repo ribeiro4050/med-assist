@@ -19,7 +19,16 @@
                 <?php if(isset($_SESSION['role_usuario']) && $_SESSION['role_usuario'] === 'medico'): ?>
                 <li class="nav-item me-3">
                     <a href="receitas.php" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-file-earmark-medical"></i>
                         Receituário
+                    </a>
+                </li>
+                <?php endif; ?>
+
+                <?php if($_SESSION['role_usuario'] === 'enfermeiro'): ?>
+                <li class="nav-item me-3">
+                    <a href="painel-enfermagem.php" class="btn btn-outline-primary btn-sm text-white border-white">
+                        <i class="bi bi-clipboard-pulse"></i> Triagem
                     </a>
                 </li>
                 <?php endif; ?>

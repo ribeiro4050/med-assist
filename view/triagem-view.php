@@ -31,6 +31,17 @@
     }
 
     // --- FUNÇÕES DE VALIDAÇÃO CLÍNICA ---
+    
+    // Atualizado para receber sistólica e diastólica separadamente
+    function validarPressao($sis, $dia) {
+        if ($sis >= 180 || $dia >= 110) return ['msg' => 'Crise Hipertensiva', 'cor' => 'text-danger fw-bold'];
+        if ($sis >= 160 || $dia >= 100) return ['msg' => 'Hipertensão Estágio 2', 'cor' => 'text-danger fw-bold'];
+        if ($sis >= 140 || $dia >= 90) return ['msg' => 'Hipertensão Estágio 1', 'cor' => 'text-warning fw-bold'];
+        if ($sis >= 120 || $dia >= 80) return ['msg' => 'Pré-Hipertensão', 'cor' => 'text-warning fw-bold'];
+        if ($sis < 90 || $dia < 60) return ['msg' => 'Hipotensão', 'cor' => 'text-danger fw-bold'];
+        return ['msg' => 'Normal', 'cor' => 'text-success'];
+    }
+
     function validarTemperatura($temp) {
         if ($temp < 35) return ['msg' => 'Hipotermia', 'cor' => 'text-danger fw-bold'];
         if ($temp >= 37.3 && $temp < 37.8) return ['msg' => 'Estado Febril', 'cor' => 'text-warning fw-bold'];
@@ -71,12 +82,17 @@
         .bg-Laranja { background-color: #fd7e14 !important; color: white; }
         .label-result { font-size: 0.75rem; display: block; margin-top: 5px; }
         
-        /* Força os cards a terem a mesma altura */
         .stat-card {
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
+        }
+
+        @media print {
+            .no-print { display: none; }
+            body { background-color: white !important; padding: 0; }
+            .card { border: none !important; box-shadow: none !important; }
         }
     </style>
 </head>
@@ -109,12 +125,15 @@
                         <hr>
 
                         <div class="row row-cols-1 row-cols-md-5 g-3 text-center mb-4">
+                            <?php $v_pres = validarPressao($t['pressao_sistolica'], $t['pressao_diastolica']); ?>
                             <div class="col">
                                 <div class="p-3 border rounded bg-white stat-card">
                                     <i class="fas fa-heartbeat text-danger mb-2"></i>
-                                    <div class="small text-muted">Pressão</div>
-                                    <div class="fw-bold"><?= $t['pressao_arterial']; ?></div>
-                                    <span class="label-result text-muted">mmHg</span>
+                                    <div class="small text-muted">Pressão (mmHg)</div>
+                                    <div class="fw-bold">
+                                        <?= $t['pressao_sistolica'] / 10; ?> / <?= $t['pressao_diastolica'] / 10; ?>
+                                    </div>
+                                    <span class="label-result <?= $v_pres['cor']; ?>"><?= $v_pres['msg']; ?></span>
                                 </div>
                             </div>
                             

@@ -159,7 +159,8 @@ if (isset($_POST['create_receita'])) {
             'paciente_id'         => filtrar_sql($_POST['paciente_id']),
             'enfermeiro_id'       => $_SESSION['id_usuario'], // Pega o ID de quem está logado
             'queixa_principal'    => filtrar_sql($_POST['queixa_principal']),
-            'pressao_arterial'    => filtrar_sql($_POST['pressao_arterial']),
+            'pressao_sistolica'   => filtrar_sql($_POST['pressao_sistolica']),
+            'pressao_diastolica'  => filtrar_sql($_POST['pressao_diastolica']),
             'temperatura'         => filtrar_sql($_POST['temperatura']),
             'peso'                => filtrar_sql($_POST['peso']),
             'altura'              => filtrar_sql($_POST['altura']),
