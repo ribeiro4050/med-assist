@@ -43,6 +43,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"></head>
   <body>
     <?php include('navbar.php'); ?>
+    <div class="container mt-3">
+        <?php include('mensagens.php'); ?>
+    </div>
+<div class="container mt-5">
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-12">

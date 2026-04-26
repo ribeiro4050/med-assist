@@ -11,7 +11,8 @@
     <title>Cadastro - MedAssist</title>
     <link rel="icon" type="image/png" href="../img/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  </head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
   <body class="bg-light"> 
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="col-md-5">
@@ -42,7 +43,22 @@
                         
                         <div class="mb-3">
                             <label for="senha" class="form-label">Senha</label>
-                            <input type="password" name="senha" id="senha" class="form-control" required>
+                            <div class="input-group">
+                                <input type="password" name="senha" id="senha" class="form-control" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('senha', 'eye-icon-1')">
+                                    <i id="eye-icon-1" class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="senha_confirmar" class="form-label">Confirmar Senha</label>
+                            <div class="input-group">
+                                <input type="password" name="senha_confirmar" id="senha_confirmar" class="form-control" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('senha_confirmar', 'eye-icon-2')">
+                                    <i id="eye-icon-2" class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         
                         <button type="submit" name="create_usuario" class="btn btn-primary w-100 mt-3">Cadastrar</button>
@@ -58,5 +74,21 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-  </body>
+        <script>
+    function togglePassword(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = document.getElementById(iconId);
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('bi-eye');
+            eyeIcon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('bi-eye-slash');
+            eyeIcon.classList.add('bi-eye');
+        }
+    }
+    </script>
+</body>
 </html>

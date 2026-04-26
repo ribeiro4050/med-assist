@@ -81,7 +81,27 @@
     <link rel="icon" type="image/png" href="../img/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  </head>
+    <style>
+        /* Isso faz com que os botões e a barra de navegação sumam na hora de imprimir */
+        @media print {
+            .btn, nav, .navbar, .card-header a { 
+                display: none !important; 
+            }
+            .card {
+                border: none !important;
+                shadow: none !important;
+            }
+            body {
+                background-color: white !important;
+            }
+            .container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
   <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-5 mb-5">
@@ -129,6 +149,22 @@
                         <h5 class="border-bottom pb-2 mt-4 text-secondary">Observações</h5>
                         <p><?= $receita['observacoes'] ?></p>
                         <?php endif; ?>
+                        <div class="mt-5 pt-3 border-top text-center">
+                            <h6 class="text-uppercase fw-bold text-muted mb-3" style="font-size: 0.8rem;">Assinatura Digital de Autenticidade</h6>
+                            
+                            <?php if (!empty($receita['token_assinatura'])): ?>
+                                <div class="d-flex flex-column align-items-center">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=<?= $receita['token_assinatura'] ?>" 
+                                        alt="QR Code Assinatura" class="img-thumbnail mb-2" style="width: 150px;">
+                                    <p class="small text-muted mb-0">Esta receita foi assinada digitalmente pelo MedAssist.</p>
+                                    <code class="text-break small text-secondary" style="font-size: 0.65rem; max-width: 300px;">
+                                        TOKEN: <?= $receita['token_assinatura'] ?>
+                                    </code>
+                                </div>
+                            <?php else: ?>
+                                <p class="text-danger small"><i class="bi bi-exclamation-triangle"></i> Assinatura digital não encontrada.</p>
+                            <?php endif; ?>
+                        </div>                        
                         
                         <?php if($role === 'medico' && $receita['medico_id'] == $usuario_id): ?>
                         <div class="mt-4 pt-3 border-top">

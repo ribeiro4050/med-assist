@@ -18,8 +18,15 @@
         $email = filtrar_sql($_POST['email']);
         $data_nascimento = filtrar_sql($_POST['data_nascimento']);
         
-        // Criptografia da Senha com um hash forte
+        // Validação de Confirmação de Senha
         $senha_pura = trim($_POST['senha']);
+        $senha_confirmar = trim($_POST['senha_confirmar']);
+
+        if ($senha_pura !== $senha_confirmar) {
+            $_SESSION['mensagem'] = "As senhas não conferem!";
+            header('Location: ../view/usuario-create.php');
+            exit;
+        }
         // se a senha for vazia, devolve string vazia e evita erro no password_hash
         $senha_hash = !empty($senha_pura) ? filtrar_sql(password_hash($senha_pura, PASSWORD_DEFAULT)) : '';
         
@@ -58,17 +65,31 @@
 
 
     // ---  LÓGICA DE ATUALIZAÇÃO (UPDATE) ---
+// ---  LÓGICA DE ATUALIZAÇÃO (UPDATE) ---
     if(isset($_POST['update_usuario'])){
         $usuario_id = filtrar_sql($_POST['usuario_id']);
         $nome = filtrar_sql($_POST['nome']);
         $email = filtrar_sql($_POST['email']);
         $data_nascimento = filtrar_sql($_POST['data_nascimento']);
-        $senha = filtrar_sql($_POST['senha']);
+        
+        // --- NOVO: Captura de Senha e Confirmação ---
+        $senha = $_POST['senha']; 
+        $senha_confirmar = $_POST['senha_confirmar'] ?? ''; 
+
+        // Só valida se o usuário preencheu o campo de senha
+        if (!empty($senha)) {
+            if ($senha !== $senha_confirmar) {
+                $_SESSION['mensagem'] = "As senhas não conferem!";
+                header("Location: ../view/usuario-edit.php?id=$usuario_id");
+                exit;
+            }
+        }
+
         $role = filtrar_sql($_POST['role'] ?? '');
         $crm_registro = filtrar_sql($_POST['crm_registro'] ?? '');
         $coren_registro = filtrar_sql($_POST['coren_registro'] ?? '');
 
-
+        // Início da montagem do SQL (Mantendo sua estrutura original)
         $sql = "UPDATE usuarios SET nome = '$nome', email = '$email', data_nascimento = '$data_nascimento'";
         
         if(!empty($role)) {
@@ -83,14 +104,15 @@
         }
 
          if(!empty($senha)){
-            // Se a senha for fornecida, cria um novo hash
+            // Se a senha for fornecida e passou na validação acima, cria um novo hash
             $sql .= ", senha = '". password_hash($senha, PASSWORD_DEFAULT) . "'";
          }
-           
+            
         $sql .= " WHERE id = $usuario_id";
 
         mysqli_query($conexao, $sql);
 
+        // Verificação de sucesso (Mantendo sua lógica de mensagens)
         if(mysqli_affected_rows($conexao) > 0){ 
             $_SESSION['mensagem'] = "Usuário atualizado com sucesso";
             header('Location: ../view/lista-de-usuarios.php'); 
@@ -122,13 +144,23 @@
     }
 
     // --- CRIAÇÃO DE RECEITA ---
+// --- CRIAÇÃO DE RECEITA COM TOKEN DE ASSINATURA ---
 if (isset($_POST['create_receita'])) {
-    // Coleta dados da receita
+    // Geração do Token de Assinatura Digital (Simulado para o TCC)
+    $medico_id = filtrar_sql($_POST['medico_id']);
+    $paciente_id = filtrar_sql($_POST['paciente_id']);
+    $timestamp = date('Y-m-d H:i:s');
+    
+    // O token é um hash único combinando IDs e o tempo exato da criação
+    $token_assinatura = hash('sha256', $medico_id . $paciente_id . $timestamp);
+
+    // Coleta dados da receita (Todos os campos originais mantidos + o novo Token)
     $dados_receita = [
-        'medico_id' => filtrar_sql($_POST['medico_id']),
-        'paciente_id' => filtrar_sql($_POST['paciente_id']),
+        'medico_id' => $medico_id,
+        'paciente_id' => $paciente_id,
         'tipo_receita' => filtrar_sql($_POST['tipo_receita']),
-        'observacoes' => filtrar_sql($_POST['observacoes'] ?? '')
+        'observacoes' => filtrar_sql($_POST['observacoes'] ?? ''),
+        'token_assinatura' => $token_assinatura
     ];
 
     // Coleta arrays de itens (filtrando cada um)

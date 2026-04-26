@@ -13,13 +13,13 @@ class ReceitaService {
         $paciente_id = $dados['paciente_id'];
         $tipo_receita = $dados['tipo_receita'];
         $observacoes = $dados['observacoes'];
+        $token_assinatura = $dados['token_assinatura']; // Novo campo vindo do controller
         $data_prescricao = date('Y-m-d H:i:s');
 
         // SQL da Receita Principal
         $obs_value = empty($observacoes) ? "NULL" : "'$observacoes'";
-        $sql = "INSERT INTO receitas (medico_id, paciente_id, data_prescricao, tipo_receita, observacoes) 
-                VALUES ('$medico_id', '$paciente_id', '$data_prescricao', '$tipo_receita', $obs_value)";
-
+        $sql = "INSERT INTO receitas (medico_id, paciente_id, data_prescricao, tipo_receita, observacoes, token_assinatura) 
+                VALUES ('$medico_id', '$paciente_id', '$data_prescricao', '$tipo_receita', $obs_value, '$token_assinatura')";
         if (mysqli_query($this->db, $sql)) {
             $receita_id = mysqli_insert_id($this->db);
             
