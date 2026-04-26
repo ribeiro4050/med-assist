@@ -49,7 +49,7 @@
             <div class="card-header bg-primary text-white">
               <h4 class="mb-0">
                 <span class="bi-file-earmark-medical"></span> Emitir Nova Receita
-                <a href="receitas.php" class="btn btn-light float-end">Voltar</a>
+                <a href="javascript:history.go(-1)" class="btn btn-light float-end">Voltar</a>
               </h4>
             </div>
             <div class="card-body">

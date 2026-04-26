@@ -215,25 +215,32 @@ if (isset($_POST['create_receita'])) {
 
     // --- LÓGICA DE LOGIN ---
     if (isset($_POST['login_usuario'])) {
-        // Usamos a sua função filtrar_sql() para os campos de texto
         $email = filtrar_sql($_POST['email'] ?? '');
         $registro = filtrar_sql($_POST['registro'] ?? '');
-        $senha = $_POST['senha']; // Senha pura para o password_verify interno
+        $senha = $_POST['senha']; 
 
-        // Chamamos o MÉTODO do nosso SERVIÇO
         $resultado = $auth->autenticar($email, $registro, $senha);
 
         if ($resultado['sucesso']) {
             $user = $resultado['dados'];
             
-            // O Controller cuida apenas da SESSÃO e do REDIRECIONAMENTO
             $_SESSION['logado'] = true;
             $_SESSION['id_usuario'] = $user['id'];
             $_SESSION['nome_usuario'] = $user['nome'];
             $_SESSION['role_usuario'] = $user['role'];
             $_SESSION['mensagem'] = "Bem-vindo(a), " . $user['nome'] . "!";
 
-            $url = ($user['role'] === 'paciente') ? '../view/home.php' : '../view/lista-de-usuarios.php';
+            
+            if ($user['role'] === 'paciente') {
+            $url = '../view/home.php';
+            } elseif ($user['role'] === 'enfermeiro') {
+                $url = '../view/home-enfermeiro.php'; 
+            } elseif ($user['role'] === 'medico') {
+                $url = '../view/painel-medico.php'; 
+            } else {
+                $url = '../view/lista-de-usuarios.php'; // Admins e outros papéis
+            }
+            
             header("Location: $url");
             exit;
         } else {

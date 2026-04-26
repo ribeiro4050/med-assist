@@ -3,9 +3,19 @@
         
         <?php
             // Determina para onde redirecionar
-            $home_link = isset($_SESSION['logado']) && $_SESSION['logado'] === true 
-                         ? "../view/lista-de-usuarios.php"  // Logado: Vai para a lista de usuários
-                         : "../view/home.php"; // Não Logado: Vai para a página de marketing
+            $home_link = "../view/home.php"; // Padrão para não logado
+
+            if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
+                if ($_SESSION['role_usuario'] === 'medico') {
+                    $home_link = "../view/painel-medico.php";
+                } elseif ($_SESSION['role_usuario'] === 'enfermeiro') {
+                    $home_link = "../view/home-enfermeiro.php";
+                } elseif ($_SESSION['role_usuario'] === 'paciente') {
+                    $home_link = "../view/home.php";
+                } else {
+                    $home_link = "../view/lista-de-usuarios.php";
+                }
+            }
         ?>
         
         <a href="<?= $home_link ?>" class="navbar-brand">

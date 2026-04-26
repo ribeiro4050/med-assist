@@ -60,7 +60,7 @@
             <div class="card-header bg-success text-white">
               <h4 class="mb-0">
                 <span class="bi-pencil-fill"></span> Editando Receita #<?= $receita_id ?>
-                <a href="receitas.php" class="btn btn-light float-end">Voltar</a>
+                <a href="javascript:history.go(-1)" class="btn btn-light float-end">Voltar</a>
               </h4>
             </div>
             <div class="card-body">
