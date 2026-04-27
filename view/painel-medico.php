@@ -3,6 +3,7 @@
         session_start();
     }
 
+    // 1. Proteção de Acesso: Só médicos e admins
     if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] === 'paciente') {
         header("Location: login.php");
         exit;
@@ -10,7 +11,6 @@
 
     require_once '../Model/conexao.php';
     require_once '../Model/MedicoService.php';
-    include('mensagem.php');
 
     $medicoService = new MedicoService($conexao);
     $fila = $medicoService->listarFilaEspera();
@@ -20,9 +20,13 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Médico - MedAssist</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         .card-paciente { border-left: 5px solid #dee2e6; transition: 0.3s; }
         .border-Vermelho { border-left-color: #dc3545 !important; }
@@ -38,6 +42,8 @@
     <?php include('navbar.php'); ?>
 
     <div class="container py-4">
+        <?php include('mensagem.php'); ?>
+
         <div class="row mb-4">
             <div class="col-md-8">
                 <h2 class="fw-bold"><i class="fas fa-user-md me-2 text-primary"></i>Fila de Atendimento</h2>
@@ -95,11 +101,9 @@
                                             <div class="d-flex justify-content-center gap-2">
                                                 <a href="triagem-view.php?id=<?= $p['triagem_id']; ?>" 
                                                    class="btn btn-outline-secondary btn-sm rounded-pill" 
-                                                   target="_blank" 
                                                    title="Ver Triagem Completa">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-
                                                 <a href="receita-create.php?paciente_id=<?= $p['paciente_id']; ?>&triagem_id=<?= $p['triagem_id']; ?>" 
                                                    class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm">
                                                     <i class="fas fa-stethoscope me-1"></i> Atender
@@ -111,11 +115,7 @@
                             <?php else: ?>
                                 <tr>
                                     <td colspan="5" class="text-center py-5 text-muted">
-                                        <?php if($fila === false): ?>
-                                            <p class="text-danger">Erro ao carregar dados. Verifique as colunas do banco.</p>
-                                        <?php else: ?>
-                                            <p>Nenhum paciente aguardando atendimento.</p>
-                                        <?php endif; ?>
+                                        <p>Nenhum paciente aguardando atendimento.</p>
                                     </td>
                                 </tr>
                             <?php endif; ?>
@@ -125,5 +125,10 @@
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
 </body>
 </html>

@@ -12,7 +12,6 @@
     // 2. Importações Necessárias
     require_once '../Model/conexao.php';
     require_once '../Model/EnfermagemService.php';
-    include('mensagem.php');
 
     // 3. Inicialização do Serviço e Busca de Dados
     $enfermagemService = new EnfermagemService($conexao);
@@ -56,6 +55,7 @@
    <br>
 
     <div class="container">
+        <?php include('mensagem.php'); ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">

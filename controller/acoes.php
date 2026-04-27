@@ -248,7 +248,16 @@ if (isset($_POST['create_receita'])) {
             $_SESSION['role_usuario'] = $user['role'];
             $_SESSION['mensagem'] = "Bem-vindo(a), " . $user['nome'] . "!";
 
-            $url = ($user['role'] === 'paciente') ? '../view/home.php' : '../view/lista-de-usuarios.php';
+            if ($user['role'] === 'paciente') {
+                $url = '../view/home.php';
+            } elseif ($user['role'] === 'enfermeiro') {
+                $url = '../view/home-enfermeiro.php'; 
+            } elseif ($user['role'] === 'medico') {
+                $url = '../view/painel-medico.php'; 
+            } else {
+                // Admins ou outros cargos 
+                $url = '../view/lista-de-usuarios.php'; 
+            }
             header("Location: $url");
             exit;
         } else {

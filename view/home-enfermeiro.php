@@ -49,8 +49,8 @@ $nome_user = explode(" ", $_SESSION['nome_usuario'])[0];
 <body class="bg-light">
 
     <?php include('navbar.php'); ?>
-
     <div class="container py-4">
+        <?php include('mensagem.php'); ?>
         <div class="row mb-4">
             <div class="col">
                 <h2 class="fw-bold">Olá, Enfermeiro(a) <?php echo $nome_user; ?>! 👋</h2>

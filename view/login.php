@@ -4,7 +4,7 @@
     }
 
     // Inclui o arquivo de mensagem para exibir alertas de erro ou sucesso
-    include('mensagem.php'); 
+    
 ?>
 <!doctype html>
 <html lang="pt-br">
@@ -18,6 +18,7 @@
   <body class="bg-light">
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
         <div class="col-md-5">
+            <?php include('mensagem.php'); ?>
             <div class="card shadow-lg">
                 <div class="card-header bg-dark text-white text-center">
                     <h4>Acesso ao Sistema</h4>

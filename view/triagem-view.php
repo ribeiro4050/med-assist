@@ -191,7 +191,7 @@
                                 <strong><?= date('d/m/Y \à\s H:i', strtotime($t['data_hora'])); ?></strong>
                             </div>
                             <div class="no-print">
-                                <a href="painel-enfermagem.php" class="btn btn-secondary me-2">Voltar</a>
+                                <a href="javascript:history.go(-1)" class="btn btn-secondary me-2">Voltar</a>
                                 <button onclick="window.print()" class="btn btn-dark"><i class="fas fa-print me-1"></i> Imprimir</button>
                             </div>
                         </div>

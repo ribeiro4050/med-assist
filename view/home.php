@@ -3,7 +3,6 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-  include('mensagem.php'); 
 ?>
 
 <!DOCTYPE html>
@@ -74,6 +73,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 <!-- Hero Section -->
 <div class="primeira-parte">
   <div class="container">
+    <?php include('mensagem.php'); ?>
     <div class="hero-content text-center text-white py-5">
       <h1 class="display-4 fw-bold mb-4">Bem-Vindo a MedAssit</h1>
       <p class="lead mb-4">Buscamos transformar a eficiência da assistência médica com tecnologia de ponta</p>
