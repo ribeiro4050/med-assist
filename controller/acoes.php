@@ -16,6 +16,7 @@
       
         $nome = filtrar_sql($_POST['nome']);
         $email = filtrar_sql($_POST['email']);
+        $cpf = filtrar_sql($_POST['cpf']);
         $data_nascimento = filtrar_sql($_POST['data_nascimento']);
         
         // Validação de Confirmação de Senha
@@ -43,8 +44,9 @@
         }
 
         // inserção no banco
-        $sql = "INSERT INTO usuarios (nome, email, data_nascimento, senha, role, crm_registro, coren_registro) 
-                VALUES ('$nome', '$email', '$data_nascimento', '$senha_hash', '$role', ";
+        // inserção no banco atualizada com CPF
+        $sql = "INSERT INTO usuarios (nome, email, cpf, data_nascimento, senha, role, crm_registro, coren_registro) 
+                VALUES ('$nome', '$email', '$cpf', '$data_nascimento', '$senha_hash', '$role', ";
         
         // Adiciona valores de registro de forma segura, tratando NULL se vazio
         $sql .= empty($crm_registro) ? "NULL, " : "'$crm_registro', ";
@@ -68,8 +70,21 @@
 // ---  LÓGICA DE ATUALIZAÇÃO (UPDATE) ---
     if(isset($_POST['update_usuario'])){
         $usuario_id = filtrar_sql($_POST['usuario_id']);
+        
+        // --- INÍCIO DA CORREÇÃO DE PERMISSÃO ---
+        // Permite se: For funcionário/admin (role != paciente) OU se o ID logado for o mesmo do perfil
+        $pode_editar = ($_SESSION['role_usuario'] !== 'paciente' || $_SESSION['id_usuario'] == $usuario_id);
+
+        if (!$pode_editar) {
+            $_SESSION['mensagem'] = "Acesso negado. Você não tem permissão para editar este perfil.";
+            header("Location: ../view/perfil.php");
+            exit;
+        }
+        // --- FIM DA CORREÇÃO ---
+
         $nome = filtrar_sql($_POST['nome']);
         $email = filtrar_sql($_POST['email']);
+        $cpf = filtrar_sql($_POST['cpf']); // <-- INSERIR ESTA LINHA
         $data_nascimento = filtrar_sql($_POST['data_nascimento']);
         
         // --- NOVO: Captura de Senha e Confirmação ---
@@ -89,8 +104,8 @@
         $crm_registro = filtrar_sql($_POST['crm_registro'] ?? '');
         $coren_registro = filtrar_sql($_POST['coren_registro'] ?? '');
 
-        // Início da montagem do SQL (Mantendo sua estrutura original)
-        $sql = "UPDATE usuarios SET nome = '$nome', email = '$email', data_nascimento = '$data_nascimento'";
+        // Início da montagem do SQL incluindo o CPF
+        $sql = "UPDATE usuarios SET nome = '$nome', email = '$email', cpf = '$cpf', data_nascimento = '$data_nascimento'";
         
         if(!empty($role)) {
             $sql .= ", role = '$role'";
@@ -215,32 +230,25 @@ if (isset($_POST['create_receita'])) {
 
     // --- LÓGICA DE LOGIN ---
     if (isset($_POST['login_usuario'])) {
+        // Usamos a sua função filtrar_sql() para os campos de texto
         $email = filtrar_sql($_POST['email'] ?? '');
         $registro = filtrar_sql($_POST['registro'] ?? '');
-        $senha = $_POST['senha']; 
+        $senha = $_POST['senha']; // Senha pura para o password_verify interno
 
+        // Chamamos o MÉTODO do nosso SERVIÇO
         $resultado = $auth->autenticar($email, $registro, $senha);
 
         if ($resultado['sucesso']) {
             $user = $resultado['dados'];
             
+            // O Controller cuida apenas da SESSÃO e do REDIRECIONAMENTO
             $_SESSION['logado'] = true;
             $_SESSION['id_usuario'] = $user['id'];
             $_SESSION['nome_usuario'] = $user['nome'];
             $_SESSION['role_usuario'] = $user['role'];
             $_SESSION['mensagem'] = "Bem-vindo(a), " . $user['nome'] . "!";
 
-            
-            if ($user['role'] === 'paciente') {
-            $url = '../view/home.php';
-            } elseif ($user['role'] === 'enfermeiro') {
-                $url = '../view/home-enfermeiro.php'; 
-            } elseif ($user['role'] === 'medico') {
-                $url = '../view/painel-medico.php'; 
-            } else {
-                $url = '../view/lista-de-usuarios.php'; // Admins e outros papéis
-            }
-            
+            $url = ($user['role'] === 'paciente') ? '../view/home.php' : '../view/lista-de-usuarios.php';
             header("Location: $url");
             exit;
         } else {

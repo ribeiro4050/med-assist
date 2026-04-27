@@ -44,7 +44,7 @@
   <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-3">
-        <?php include('mensagem.php'); ?>
+        <?php include('mensagens.php'); ?>
     </div>
 <div class="container mt-5">
     <div class="container mt-5">
