@@ -44,7 +44,7 @@
   <body>
     <?php include('navbar.php'); ?>
     <div class="container mt-3">
-        <?php include('mensagens.php'); ?>
+        <?php include('mensagem.php'); ?>
     </div>
 <div class="container mt-5">
     <div class="container mt-5">
@@ -88,6 +88,10 @@
                                 <p class="form-control">
                                     <?= $usuario['email']?>
                                 </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-muted">CPF</label>
+                                <p class="form-control bg-light"><?= $usuario['cpf']; ?></p>
                             </div>
                             <div class="mb-3">
                                 <label for="">Nascimento</label>

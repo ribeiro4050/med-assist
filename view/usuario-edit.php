@@ -47,6 +47,10 @@
                                 <input type="text" name="email" value="<?= $usuario['email']?>" class="form-control" id="">
                             </div>
                             <div class="mb-3">
+                                <label for="cpf" class="form-label">CPF</label>
+                                <input type="text" name="cpf" id="cpf" value="<?= $usuario['cpf']; ?>" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
                                 <label for="">Data de nascimento</label>
                                 <input type="date" name="data_nascimento" value="<?= $usuario['data_nascimento']?>" class="form-control" id="">
                             </div>
@@ -103,6 +107,13 @@
             eyeIcon.classList.add('bi-eye');
         }
     }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#cpf').mask('000.000.000-00');
+        });
     </script>
 </body>
 </html>

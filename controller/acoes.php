@@ -52,14 +52,27 @@
         $sql .= empty($crm_registro) ? "NULL, " : "'$crm_registro', ";
         $sql .= empty($coren_registro) ? "NULL)" : "'$coren_registro')";
 
-        $query = mysqli_query($conexao, $sql);
+        try {
+            $query = mysqli_query($conexao, $sql);
 
-        if($query) { 
-            $_SESSION['mensagem'] = "Usuário criado com sucesso";
-            header('Location: ../view/lista-de-usuarios.php'); 
-            exit;
-        } else {
-            $_SESSION['mensagem'] = "Usuário não foi criado. Erro: " . mysqli_error($conexao);
+            if($query) { 
+                $_SESSION['mensagem'] = "Usuário criado com sucesso!";
+                
+                if(isset($_SESSION['logado']) && $_SESSION['role_usuario'] !== 'paciente'){
+                    header('Location: ../view/lista-de-usuarios.php'); 
+                } else {
+                    header('Location: ../view/login.php'); 
+                }
+                exit;
+            }
+        } catch (mysqli_sql_exception $e) {
+            // O código 1062 indica entrada duplicada no MySQL
+            if ($e->getCode() === 1062) {
+                $_SESSION['mensagem'] = "Erro: Este CPF ou E-mail já está cadastrado.";
+            } else {
+                $_SESSION['mensagem'] = "Erro ao criar usuário: " . $e->getMessage();
+            }
+            
             header('Location: ../view/usuario-create.php');
             exit;
         }
@@ -125,16 +138,18 @@
             
         $sql .= " WHERE id = $usuario_id";
 
-        mysqli_query($conexao, $sql);
-
-        // Verificação de sucesso (Mantendo sua lógica de mensagens)
-        if(mysqli_affected_rows($conexao) > 0){ 
-            $_SESSION['mensagem'] = "Usuário atualizado com sucesso";
-            header('Location: ../view/lista-de-usuarios.php'); 
+        // --- TRECHO ATUALIZADO PARA MENSAGENS E REDIRECIONAMENTO ---
+        if(mysqli_query($conexao, $sql)){ 
+            // Usamos 'mensagem' pois é o padrão que você já usa no resto do arquivo
+            $_SESSION['mensagem'] = "Atualização feita com sucesso!";
+            
+            // Redireciona para o perfil se for o próprio usuário, ou lista se for admin
+            $location = ($_SESSION['role_usuario'] === 'paciente') ? '../view/perfil.php' : '../view/lista-de-usuarios.php';
+            header("Location: $location"); 
             exit;
         } else {
-            $_SESSION['mensagem'] = "Nenhuma alteração feita ou Usuário não foi encontrado/atualizado. Erro: " . mysqli_error($conexao);
-            header('Location: ../view/lista-de-usuarios.php');
+            $_SESSION['mensagem'] = "Erro ao atualizar: " . mysqli_error($conexao);
+            header('Location: ../view/perfil.php');
             exit;
         }
     }
