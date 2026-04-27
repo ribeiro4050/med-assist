@@ -90,6 +90,10 @@
                                 </p>
                             </div>
                             <div class="mb-3">
+                                <label class="text-muted">CPF</label>
+                                <p class="form-control bg-light"><?= $usuario['cpf']; ?></p>
+                            </div>
+                            <div class="mb-3">
                                 <label for="">Nascimento</label>
                                 <p class="form-control">
                                     <?= date('d/m/Y', strtotime($usuario['data_nascimento']))?>
