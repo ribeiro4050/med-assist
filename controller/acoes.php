@@ -294,4 +294,106 @@ if (isset($_POST['create_receita'])) {
         exit;
     }
 
+    // --- LÓGICA DE SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA ---
+    // --- LÓGICA DE SOLICITAÇÃO DE RECUPERAÇÃO DE SENHA ---
+    if (isset($_POST['esqueci_senha'])) {
+        $email = filtrar_sql($_POST['email']);
+        
+        $query_usuario = mysqli_query($conexao, "SELECT id FROM usuarios WHERE email = '$email'");
+        
+        if (mysqli_num_rows($query_usuario) > 0) {
+            $codigo = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+            $expiracao = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
+            mysqli_query($conexao, "UPDATE recuperacao_senha SET usado = 1 WHERE email = '$email'");
+
+            $sql = "INSERT INTO recuperacao_senha (email, codigo, data_expiracao) 
+                    VALUES ('$email', '$codigo', '$expiracao')";
+            
+            if (mysqli_query($conexao, $sql)) {
+                
+                // --- NOVA LOGICA DE ENVIO REAL ---
+                require_once 'RecuperacaoEmailController.php';
+                $enviou = RecuperacaoEmailController::enviarCodigo($email, $codigo);
+
+                if ($enviou) {
+                    $_SESSION['mensagem'] = "Código enviado com sucesso para o e-mail cadastrado!";
+                } else {
+                    $_SESSION['mensagem'] = "Código gerado, mas houve um erro ao enviar o e-mail. Verifique o banco de dados (Teste).";
+                }
+                
+                $_SESSION['email_recuperacao'] = $email;
+                header('Location: ../view/verificar-codigo.php');
+                exit;
+            }
+        } else {
+            $_SESSION['mensagem'] = "E-mail não encontrado em nossa base.";
+            header('Location: ../view/login.php');
+            exit;
+        }
+    }
+
+    // --- LÓGICA DE VALIDAÇÃO DO CÓDIGO ---
+    if (isset($_POST['validar_codigo'])) {
+        $email = $_SESSION['email_recuperacao'];
+        $codigo_digitado = filtrar_sql($_POST['codigo_verificacao']);
+        $agora = date('Y-m-d H:i:s');
+
+        // Busca o código no banco que pertença a esse email, não tenha sido usado e não tenha expirado
+        $sql = "SELECT * FROM recuperacao_senha 
+                WHERE email = '$email' 
+                AND codigo = '$codigo_digitado' 
+                AND usado = 0 
+                AND data_expiracao > '$agora'
+                LIMIT 1";
+
+        $result = mysqli_query($conexao, $sql);
+
+        if (mysqli_num_rows($result) > 0) {
+            // Código válido! 
+            $_SESSION['pode_mudar_senha'] = true; // Libera o acesso à tela de nova senha
+            header('Location: ../view/nova-senha.php');
+            exit;
+        } else {
+            $_SESSION['mensagem'] = "Código inválido ou expirado. Tente novamente.";
+            header('Location: ../view/verificar-codigo.php');
+            exit;
+        }
+    }
+
+    // --- LÓGICA DE DEFINIÇÃO DE NOVA SENHA ---
+    if (isset($_POST['atualizar_senha_esquecida'])) {
+        $email = $_SESSION['email_recuperacao'];
+        $nova_senha = $_POST['nova_senha'];
+        $confirmar_senha = $_POST['confirmar_senha'];
+
+        if ($nova_senha !== $confirmar_senha) {
+            $_SESSION['mensagem'] = "As senhas não conferem!";
+            header('Location: ../view/nova-senha.php');
+            exit;
+        }
+
+        // Criptografa a nova senha
+        $senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
+
+        // 1. Atualiza a senha do usuário
+        $sql_update = "UPDATE usuarios SET senha = '$senha_hash' WHERE email = '$email'";
+        
+        if (mysqli_query($conexao, $sql_update)) {
+            // 2. Invalida o código para ele não ser usado de novo
+            mysqli_query($conexao, "UPDATE recuperacao_senha SET usado = 1 WHERE email = '$email'");
+            
+            // 3. Limpa a sessão de recuperação
+            unset($_SESSION['email_recuperacao']);
+            unset($_SESSION['pode_mudar_senha']);
+
+            $_SESSION['mensagem'] = "Senha atualizada com sucesso! Faça login agora.";
+            header('Location: ../view/login.php');
+            exit;
+        } else {
+            $_SESSION['mensagem'] = "Erro ao atualizar senha. Tente novamente.";
+            header('Location: ../view/nova-senha.php');
+            exit;
+        }
+    }
 ?>

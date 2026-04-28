@@ -45,6 +45,10 @@
                             <label for="senha" class="form-label">Senha</label>
                             <input type="password" name="senha" id="senha" class="form-control" required>
                         </div>
+
+                        <div class="mb-3 text-end">
+                            <a href="esqueci-senha.php" class="text-decoration-none small">Esqueci minha senha</a>
+                        </div>
                         
                         <button type="submit" name="login_usuario" class="btn btn-primary w-100 mt-3">Acessar</button>
 
