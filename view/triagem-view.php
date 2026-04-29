@@ -46,7 +46,7 @@
         if ($temp < 35) return ['msg' => 'Hipotermia', 'cor' => 'text-danger fw-bold'];
         if ($temp >= 37.3 && $temp < 37.8) return ['msg' => 'Estado Febril', 'cor' => 'text-warning fw-bold'];
         if ($temp >= 37.8 && $temp < 39.0) return ['msg' => 'Febre', 'cor' => 'text-danger fw-bold'];
-        if ($temp >= 39.0) return ['msg' => 'Febre', 'cor' => 'text-danger fw-bold'];
+        if ($temp >= 39.0) return ['msg' => 'Febre Alta', 'cor' => 'text-danger fw-bold'];
         return ['msg' => 'Normal', 'cor' => 'text-success'];
     }
 

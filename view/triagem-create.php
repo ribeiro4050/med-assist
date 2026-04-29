@@ -129,7 +129,7 @@
 
                             <hr>
                             <div class="d-flex justify-content-between">
-                                <a href="painel-enfermagem.php" class="btn btn-secondary">Cancelar</a>
+                                <a href="javascript:history.go(-1)" class="btn btn-secondary">Cancelar</a>
                                 <button type="submit" name="create_triagem" class="btn btn-primary px-5">Finalizar Triagem</button>
                             </div>
                         </form>
