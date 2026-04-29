@@ -13,10 +13,12 @@ class AuthService {
 
         // Tenta localizar por Email ou Registro (CRM/COREN)
         if (!empty($email)) {
-            $email_limpo = mysqli_real_escape_string($this->db, $email);
+            // O trim() remove espaços em branco acidentais antes de enviar para o banco
+            $email_limpo = mysqli_real_escape_string($this->db, trim($email));
             $sql = "SELECT * FROM usuarios WHERE email = '$email_limpo'";
         } else if (!empty($registro)) {
             $reg_limpo = mysqli_real_escape_string($this->db, $registro);
+            // Busca pelo registro em ambas as colunas profissionais
             $sql = "SELECT * FROM usuarios WHERE crm_registro = '$reg_limpo' OR coren_registro = '$reg_limpo'";
         } else {
             return ['sucesso' => false, 'erro' => "Preencha o Email ou o Registro."];

@@ -3,11 +3,12 @@ session_start();
 // inicia a sessão para usar variáveis de sessão, tanto para salvar quanto para ler, como no caso de exibir mensagens para o usuario, sem esse comando a sessão não funciona logo as mensagens de erro ou sucesso não aparecem  
 require '../Model/conexao.php';
 
-if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['role_usuario'] == 'paciente') {
-        $_SESSION['mensagem'] = "Acesso negado. Apenas funcionarios podem gerenciar pacientes.";
-        header('Location: home.php');
-        exit;
-    }
+// Trava de segurança: Só permite ADMIN. Se não for admin, chuta para a home correspondente.
+if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['role_usuario'] !== 'admin') {
+    $_SESSION['mensagem'] = "Acesso negado. Esta área é restrita ao administrador.";
+    header('Location: home.php');
+    exit;
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -42,6 +43,7 @@ if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['rol
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Email</th>
+                    <th>Cargo</th>
                     <th>Data de nascimento</th>
                     <th>Ações</th>
                   </tr>
@@ -67,6 +69,17 @@ if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['rol
                     <td><?= $usuario['id']?></td>
                     <td><?= $usuario['nome']?></td>
                     <td><?= $usuario['email']?></td>
+                    <td>
+                        <?php 
+                            $role = $usuario['role'];
+                            $classe = 'bg-secondary';
+                            if($role == 'admin') $classe = 'bg-danger';
+                            if($role == 'medico') $classe = 'bg-primary';
+                            if($role == 'enfermeiro') $classe = 'bg-info';
+                            if($role == 'paciente') $classe = 'bg-success';
+                        ?>
+                        <span class="badge <?= $classe ?>"><?= ucfirst($role) ?></span>
+                    </td>
                     <td><?= date('d/m/Y', strtotime($usuario['data_nascimento']))
                     // formata a data de nascimento para o formato brasileiro dia/mes/ano
                     ?></td>

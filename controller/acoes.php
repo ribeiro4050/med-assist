@@ -77,6 +77,47 @@
             exit;
         }
     }
+    
+    // --- LÓGICA DE CADASTRO INSTITUCIONAL (ADM CADASTRANDO PROFISSIONAL) ---
+    if (isset($_POST['cadastrar_profissional'])) {
+        // Apenas Admin pode executar essa ação (Segurança extra no back-end)
+        if ($_SESSION['role_usuario'] !== 'admin') {
+            $_SESSION['mensagem'] = "Erro: Você não tem permissão para realizar esta ação.";
+            header('Location: ../view/login.php');
+            exit;
+        }
+
+        $nome = filtrar_sql($_POST['nome']);
+        $email = filtrar_sql($_POST['email']);
+        $cpf = filtrar_sql($_POST['cpf']);
+        $role = filtrar_sql($_POST['role_usuario']);
+        $registro = filtrar_sql($_POST['registro_profissional']);
+        $senha_pura = $_POST['senha'];
+        $senha_hash = password_hash($senha_pura, PASSWORD_DEFAULT);
+
+        // Define qual coluna de registro usar com base na role
+        $coluna_registro = ($role === 'medico') ? 'crm_registro' : 'coren_registro';
+
+        // SQL de inserção rigorosa
+        $sql = "INSERT INTO usuarios (nome, email, cpf, senha, role, $coluna_registro) 
+                VALUES ('$nome', '$email', '$cpf', '$senha_hash', '$role', '$registro')";
+
+        try {
+            if (mysqli_query($conexao, $sql)) {
+                $_SESSION['mensagem'] = "Profissional ($role) cadastrado com sucesso!";
+                header('Location: ../view/admin-painel.php');
+                exit;
+            }
+        } catch (mysqli_sql_exception $e) {
+            if ($e->getCode() === 1062) {
+                $_SESSION['mensagem'] = "Erro: Este CPF, E-mail ou Registro já está cadastrado.";
+            } else {
+                $_SESSION['mensagem'] = "Erro ao cadastrar profissional: " . $e->getMessage();
+            }
+            header('Location: ../view/admin-cadastrar-profissional.php');
+            exit;
+        }
+    }
 
 
     // ---  LÓGICA DE ATUALIZAÇÃO (UPDATE) ---

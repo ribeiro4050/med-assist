@@ -11,6 +11,8 @@
                 } elseif ($_SESSION['role_usuario'] === 'enfermeiro') {
                     $home_link = "../view/home-enfermeiro.php";
                 } elseif ($_SESSION['role_usuario'] === 'paciente') {
+                $home_link = "../view/home.php";
+                } elseif ($_SESSION['role_usuario'] === 'admin') {
                     $home_link = "../view/home.php";
                 } else {
                     $home_link = "../view/lista-de-usuarios.php";
@@ -48,6 +50,14 @@
                     <a href="../controller/historico-paciente-controller.php?id=<?php echo $_SESSION['id_usuario']; ?>" class="btn btn-outline-light btn-sm">
                     <span class="bi bi-clipboard-data"></span> &nbsp;
                     Histórico</a>
+                </li>
+                <?php endif; ?>
+                
+                <?php if($_SESSION['role_usuario'] === 'admin'): ?>
+                <li class="nav-item me-3">
+                    <a href="admin-painel.php" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-shield-lock"></i> Painel ADM
+                    </a>
                 </li>
                 <?php endif; ?>
                 
