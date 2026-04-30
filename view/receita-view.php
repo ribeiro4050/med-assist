@@ -166,17 +166,18 @@
                             <?php endif; ?>
                         </div>                        
                         
-                        <?php if($role === 'medico' && $receita['medico_id'] == $usuario_id): ?>
-                        <div class="mt-4 pt-3 border-top">
-                            <a href="receita-edit.php?id=<?= $receita_id ?>" class="btn btn-success">
-                                <span class="bi-pencil-fill"></span> Editar
-                            </a>
-                            <!-- comando window print chama o dialogo de impressao do navegador, bem legal -->
-                            <button onclick="window.print()" class="btn btn-secondary">
-                                <span class="bi-printer"></span> Imprimir
+                        <div class="mt-4 pt-3 border-top no-print">
+                            <?php if($role === 'medico' && $receita['medico_id'] == $usuario_id): ?>
+                                <a href="receita-edit.php?id=<?= $receita_id ?>" class="btn btn-success">
+                                    <span class="bi-pencil-fill"></span> Editar
+                                </a>
+                            <?php endif; ?>
+
+                            <!-- Este botão agora aparece para Médico e Paciente -->
+                            <button onclick="window.print()" class="btn btn-dark">
+                                <span class="bi-printer"></span> Imprimir Receita
                             </button>
-                            </div>
-                        <?php endif; ?>
+                        </div>
 
                     </div>
                 </div>
