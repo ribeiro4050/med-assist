@@ -54,8 +54,10 @@ function buscarHistoricoCompleto($conexao, $paciente_id) {
     
     // Buscar Historico de Exames
 
-    $sql_exames = "SELECT *, data, 'Exame' AS tipo_evento FROM exame WHERE paciente_id = ? ORDER BY data DESC"; //Desc = decrescente
-    if ($stmt_exames = mysqli_prepare($conexao, $sql_exames)) {
+$sql_exames = "SELECT id, data, tipo, resultado, link_laudo, 'Exame' AS tipo_evento 
+                   FROM exame 
+                   WHERE paciente_id = ? 
+                   ORDER BY data DESC";    if ($stmt_exames = mysqli_prepare($conexao, $sql_exames)) {
         mysqli_stmt_bind_param($stmt_exames, "i", $paciente_id);
         mysqli_stmt_execute($stmt_exames);
         $resultado_exames = mysqli_stmt_get_result($stmt_exames);

@@ -114,11 +114,11 @@ include('navbar.php');
                                 <div class="card-body">
                                     
                                 <!--Usa Operado ternario(if-else) pra dar um destaque visual ao Diagnostico mudano a cor dependedo se for danger(verdadeiro) ou primary(falso)    -->
-                                    <h5 class="card-title text-<?= ($evento['tipo_evento'] == 'diagnostico' ? 'danger' : 'primary') ?>">
+                                    <h5 class="card-title d-flex justify-content-between align-items-center text-<?= ($evento['tipo_evento'] == 'diagnostico' ? 'danger' : 'primary') ?>">
                                         <?= $titulo_evento ?> 
-                                        <small class="text-muted float-right">
-                                            <span class="badge badge-secondary"><?= $data_formatada ?></span>
-                                        </small>
+                                        <span class="badge bg-secondary text-white" style="font-size: 0.8rem;">
+                                            <i class="bi bi-calendar3"></i> <?= $data_formatada ?>
+                                        </span>
                                     </h5>
                                     <p class="card-text mb-0">
                                         <?= $detalhes ?>
