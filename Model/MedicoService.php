@@ -22,6 +22,7 @@ class MedicoService {
                     t.queixa_principal
                 FROM triagens t
                 JOIN usuarios u ON t.paciente_id = u.id
+                WHERE t.status = 'Aguardando Medico'
                 ORDER BY 
                     CASE 
                         WHEN t.classificacao_risco = 'Vermelho' THEN 1

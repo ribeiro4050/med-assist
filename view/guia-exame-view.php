@@ -59,7 +59,7 @@
                         <p class="mb-0 text-muted">Unidade de Saúde Integrada</p>
                     </div>
                     <div class="col-md-6 text-end">
-                        <p class="mb-0 fw-bold">CNES: 1234567</p>
+                        <p class="mb-0 fw-bold">CNES: 04206769</p>
                         <p class="mb-0 small text-muted">Emissão: <?= date('d/m/Y H:i', strtotime($guia['data_solicitacao'])) ?></p>
                     </div>
                 </div>

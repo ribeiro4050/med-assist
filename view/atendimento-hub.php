@@ -5,7 +5,8 @@
     }
 
     require_once '../Model/conexao.php';
-
+    /** @var mysqli $conexao */
+    
     $triagem_id = $_GET['triagem_id'] ?? '';
     if (empty($triagem_id)) { header("Location: painel-medico.php"); exit; }
 
@@ -17,7 +18,15 @@
 
     if (!$t) { header("Location: painel-medico.php"); exit; }
 
-    // --- FUNÇÕES DE VALIDAÇÃO (Mantidas conforme seu padrão) ---
+    // --- BUSCAR GUIA DE EXAME NA TABELA guia_exames GERADA HOJE ---
+    $sql_exame = "SELECT id FROM guia_exames 
+                  WHERE triagem_id = '$triagem_id' 
+                  AND DATE(data_solicitacao) = CURDATE() 
+                  ORDER BY data_solicitacao DESC LIMIT 1";
+    $res_exame = mysqli_query($conexao, $sql_exame);
+    $exame_recente = mysqli_fetch_assoc($res_exame);
+
+    // --- FUNÇÕES DE VALIDAÇÃO ---
     function validarTemperatura($temp) {
         if ($temp < 35) return ['msg' => 'Hipotermia', 'class' => 'text-primary'];
         if ($temp >= 37.3 && $temp < 37.8) return ['msg' => 'Estado Febril', 'class' => 'text-warning fw-bold'];
@@ -59,14 +68,6 @@
         return $res;
     }
 
-    if ($t['peso'] > 0 && $t['altura'] > 0) {
-        $imc = $t['peso'] / ($t['altura'] * $t['altura']);
-        if ($imc < 18.5) { $imc_texto = "Abaixo do peso"; $imc_cor = "text-warning"; }
-        elseif ($imc < 24.9) { $imc_texto = "Peso normal"; $imc_cor = "text-success"; }
-        elseif ($imc < 29.9) { $imc_texto = "Sobrepeso"; $imc_cor = "text-warning"; }
-        else { $imc_texto = "Obesidade"; $imc_cor = "text-danger"; }
-    }
-
     // Atribuição das funções às variáveis para usar no HTML
     $v_temp  = validarTemperatura($t['temperatura']);
     $v_freq  = validarFrequencia($t['frequencia_cardiaca']);
@@ -92,10 +93,21 @@
     <?php include('navbar.php'); ?>
 
     <div class="container py-4">
+        <?php include('mensagem.php'); ?>
+
         <div class="mb-4 d-flex justify-content-between align-items-center">
             <h2 class="h4 text-secondary">Atendimento: <span class="text-dark"><?= htmlspecialchars($t['nome']) ?></span></h2>
             <span class="badge bg-primary">ID Triagem: #<?= $triagem_id ?></span>
         </div>
+
+        <?php if ($exame_recente): ?>
+            <div class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4 border-0 border-start border-success border-4">
+                <span><i class="fas fa-file-medical me-2"></i> Existem guias de exame geradas para este atendimento hoje.</span>
+                <a href="guia-exame-view.php?id=<?= $exame_recente['id'] ?>" class="btn btn-success btn-sm">
+                    <i class="fas fa-eye me-1"></i> Visualizar Última Guia
+                </a>
+            </div>
+        <?php endif; ?>
 
         <div class="row g-3 mb-4 text-center">
             <div class="col">
@@ -120,9 +132,7 @@
                 <div class="card h-100 shadow-sm border-indicador border-danger">
                     <div class="card-body p-2">
                         <small class="text-muted fw-bold d-block"><i class="fas fa-pulse"></i> Freq. Card.</small>
-                        <h5 class="mb-0 text-dark"><?= $t['frequencia_cardiaca'] ?>
-                    <small>bpm</small>
-                    </h5>
+                        <h5 class="mb-0 text-dark"><?= $t['frequencia_cardiaca'] ?> <small>bpm</small></h5>
                         <small class="<?= $v_freq['class'] ?> fw-bold"><?= $v_freq['msg'] ?></small>
                     </div>
                 </div>
@@ -171,14 +181,41 @@
             </div>
         </div>
 
+        <!-- ÁREA DE FINALIZAÇÃO COM TRAVA DE SEGURANÇA -->
         <div class="mt-5 text-center pt-4 border-top">
-            <form action="../controller/ExameController.php" method="POST">
+            <form action="../controller/ExameController.php" method="POST" id="formFinalizar">
                 <input type="hidden" name="triagem_id" value="<?= $triagem_id ?>">
-                <button type="submit" name="concluir_atendimento" class="btn btn-danger btn-lg px-5 rounded-pill shadow">
+                
+                <div class="mb-3 d-flex justify-content-center">
+                    <div class="form-check text-start p-3 border rounded bg-white shadow-sm" style="max-width: 450px;">
+                        <input class="form-check-input ms-0 me-2" type="checkbox" id="checkFinalizar" name="confirmacao_prescricao">
+                        <label class="form-check-label fw-bold text-secondary" for="checkFinalizar">
+                            Confirmo que finalizei todas as prescrições e exames necessários para este atendimento.
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" name="concluir_atendimento" id="btnFinalizar" class="btn btn-danger btn-lg px-5 rounded-pill shadow" disabled>
                     <i class="fas fa-check-circle me-2"></i> Finalizar Atendimento
                 </button>
             </form>
         </div>
     </div>
+
+    <script>
+        // Habilita o botão apenas se o checkbox estiver marcado
+        const checkbox = document.getElementById('checkFinalizar');
+        const btn = document.getElementById('btnFinalizar');
+        const form = document.getElementById('formFinalizar');
+
+        checkbox.addEventListener('change', function() {
+            btn.disabled = !this.checked;
+        });
+
+        // Janela de confirmação antes de enviar
+        form.onsubmit = function() {
+            return confirm("ATENÇÃO: Você tem certeza que deseja finalizar? \n\nApós a confirmação, o atendimento será encerrado e as informações não poderão mais ser alteradas.");
+        };
+    </script>
 </body>
 </html>
