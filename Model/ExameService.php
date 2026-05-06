@@ -25,12 +25,24 @@ class ExameService {
         return mysqli_query($this->db, $sql);
     }
 
-    // NOVO MÉTODO: Altera o status para que o paciente saia da fila de espera
-    public function atualizarStatusTriagem($triagem_id, $novo_status) {
-        $id = mysqli_real_escape_string($this->db, $triagem_id);
-        $status = mysqli_real_escape_string($this->db, $novo_status);
-    
-        $sql = "UPDATE triagens SET status = '$status' WHERE id = '$id'";
-    return mysqli_query($this->db, $sql);
+    // MÉTODO CONSOLIDADO: Salva o diagnóstico e altera o status da triagem
+    public function salvarDiagnosticoEFinalizar($dados) {
+        $triagem_id  = mysqli_real_escape_string($this->db, $dados['triagem_id']);
+        $paciente_id = mysqli_real_escape_string($this->db, $dados['paciente_id']);
+        $medico_id   = mysqli_real_escape_string($this->db, $dados['medico_id']);
+        $cid_10      = mysqli_real_escape_string($this->db, $dados['cid_10']);
+        $descricao   = mysqli_real_escape_string($this->db, $dados['descricao']);
+        $data        = date('Y-m-d H:i:s');
+
+        // 1. Insere o registro na nova tabela de diagnóstico[cite: 7]
+        $sql_diag = "INSERT INTO diagnostico (triagem_id, paciente_id, medico_id, data, cid_10, descricao) 
+                     VALUES ('$triagem_id', '$paciente_id', '$medico_id', '$data', '$cid_10', '$descricao')";
+        
+        if (mysqli_query($this->db, $sql_diag)) {
+            // 2. Se salvou o diagnóstico, atualiza o status para 'atendido'[cite: 7]
+            $sql_status = "UPDATE triagens SET status = 'atendido' WHERE id = '$triagem_id'";
+            return mysqli_query($this->db, $sql_status);
+        }
+        return false;
     }
 }

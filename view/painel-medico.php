@@ -4,8 +4,8 @@
     }
 
     // 1. Proteção de Acesso: Só médicos e admins
-    if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] === 'paciente') {
-        header("Location: login.php");
+    if (!isset($_SESSION['logado']) || ($_SESSION['role_usuario'] !== 'medico' && $_SESSION['role_usuario'] !== 'admin')) {
+        header("Location: login.php"); 
         exit;
     }
 
