@@ -5,7 +5,6 @@
     }
 
     require_once '../Model/conexao.php';
-    /** @var mysqli $conexao */
     
     $triagem_id = $_GET['triagem_id'] ?? '';
     if (empty($triagem_id)) { header("Location: painel-medico.php"); exit; }
@@ -25,6 +24,19 @@
                   ORDER BY data_solicitacao DESC LIMIT 1";
     $res_exame = mysqli_query($conexao, $sql_exame);
     $exame_recente = mysqli_fetch_assoc($res_exame);
+
+    // --- BUSCAR RECEITA NA TABELA receitas GERADA HOJE ---
+    $sql_receita = "SELECT id FROM receitas 
+                WHERE paciente_id = '{$t['paciente_id']}' 
+                AND DATE(data_prescricao) = CURDATE() 
+                ORDER BY data_prescricao DESC LIMIT 1";
+    $res_receita = mysqli_query($conexao, $sql_receita);
+    $receita_recente = mysqli_fetch_assoc($res_receita);
+
+    // Cálculos de idade
+    $nascimento = new DateTime($t['data_nascimento']);
+    $hoje = new DateTime();
+    $idade = $hoje->diff($nascimento)->y;
 
     // --- FUNÇÕES DE VALIDAÇÃO ---
     function validarTemperatura($temp) {
@@ -163,31 +175,71 @@
                 <p class="card-text bg-light p-3 rounded border">"<?= nl2br(htmlspecialchars($t['queixa_principal'])) ?>"</p>
             </div>
         </div>
+        
+        <h3 class="mb-4 fw-bold text-dark"><i class="fas fa-th-large me-3 text-primary"></i>Ações Médicas</h3>
 
-        <div class="row g-4 text-center">
-            <div class="col-md-6">
-                <a href="receita-create.php?triagem_id=<?= $triagem_id ?>&paciente_id=<?= $t['paciente_id'] ?>" 
-                   class="card card-atendimento h-100 shadow bg-primary text-white p-4">
-                    <i class="fas fa-pills fa-3x mb-3"></i>
-                    <h5>Prescrever Receita</h5>
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <a href="diagnostico-create.php?triagem_id=<?= $triagem_id ?>&paciente_id=<?= $t['paciente_id'] ?>" class="card card-atendimento h-100 shadow bg-dark text-white p-4">
+                    <div class="card-body text-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="fas fa-stethoscope fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Diagnóstico</h4>
+                        <p class="mb-0 opacity-75">Registrar laudo final e CID-10</p>
+                    </div>
                 </a>
             </div>
-            <div class="col-md-6">
-                <a href="guia-exame-create.php?triagem_id=<?= $triagem_id ?>&paciente_id=<?= $t['paciente_id'] ?>" 
-                   class="card card-atendimento h-100 shadow bg-info text-white p-4">
-                    <i class="fas fa-microscope fa-3x mb-3"></i>
-                    <h5>Solicitar Guia de Exame</h5>
+
+            <div class="col-md-4">
+                <a href="receita-create.php?triagem_id=<?= $triagem_id ?>&paciente_id=<?= $t['paciente_id'] ?>" class="card card-atendimento h-100 shadow bg-primary text-white p-4">
+                    <div class="card-body text-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="fas fa-pills fa-2x"></i>
+                        </div>
+                        <h4 class="fw-bold">Prescrever Receita</h4>
+                        <p class="mb-0 opacity-75">Medicamentos e Orientações</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="guia-exame-create.php?triagem_id=<?= $triagem_id ?>&paciente_id=<?= $t['paciente_id'] ?>" class="card card-atendimento h-100 shadow bg-info text-white p-4">
+                    <div class="card-body text-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex p-3 mb-3 text-info">
+                            <i class="fas fa-microscope fa-2x text-white"></i>
+                        </div>
+                        <h4 class="fw-bold text-white">Solicitar Exames</h4>
+                        <p class="mb-0 opacity-75 text-white">Laboratoriais e Imagem</p>
+                    </div>
                 </a>
             </div>
         </div>
 
-        <!-- ÁREA DE FINALIZAÇÃO COM TRAVA DE SEGURANÇA -->
-        <div class="mt-5 text-center pt-4 border-top">
+        <?php if ($exame_recente || $receita_recente): ?>
+        <div class="alert alert-secondary bg-white border-0 shadow-sm rounded-4 p-4 mb-5">
+            <h5 class="fw-bold mb-3"><i class="fas fa-file-alt me-2 text-primary"></i>Documentos Gerados Agora</h5>
+            <div class="d-flex gap-3">
+                <?php if ($receita_recente): ?>
+                    <a href="receita-view.php?id=<?= $receita_recente['id'] ?>" target="_blank" class="btn btn-outline-primary rounded-pill">
+                        <i class="fas fa-print me-2"></i>Imprimir Receita
+                    </a>
+                <?php endif; ?>
+                <?php if ($exame_recente): ?>
+                    <a href="guia-exame-view.php?id=<?= $exame_recente['id'] ?>" target="_blank" class="btn btn-outline-info rounded-pill">
+                        <i class="fas fa-print me-2"></i>Imprimir Guia de Exame
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <div class="text-center mt-5">
             <form action="../controller/ExameController.php" method="POST" id="formFinalizar">
                 <input type="hidden" name="triagem_id" value="<?= $triagem_id ?>">
                 
-                <div class="mb-3 d-flex justify-content-center">
-                    <div class="form-check text-start p-3 border rounded bg-white shadow-sm" style="max-width: 450px;">
+                <div class="d-flex justify-content-center mb-4">
+                    <div class="form-check form-switch bg-white p-3 px-4 rounded-pill shadow-sm" style="max-width: 450px;">
                         <input class="form-check-input ms-0 me-2" type="checkbox" id="checkFinalizar" name="confirmacao_prescricao">
                         <label class="form-check-label fw-bold text-secondary" for="checkFinalizar">
                             Confirmo que finalizei todas as prescrições e exames necessários para este atendimento.
@@ -199,9 +251,15 @@
                     <i class="fas fa-check-circle me-2"></i> Finalizar Atendimento
                 </button>
             </form>
+            <div class="mt-4">
+                <a href="painel-medico.php" class="text-decoration-none text-muted">
+                    <i class="fas fa-arrow-left me-2"></i>Sair sem finalizar (O paciente continuará na fila)
+                </a>
+            </div>
         </div>
     </div>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Habilita o botão apenas se o checkbox estiver marcado
         const checkbox = document.getElementById('checkFinalizar');
