@@ -82,11 +82,16 @@ include('navbar.php');
                             $detalhes = "Tipo: " . htmlspecialchars($evento['tipo']) . "<br>Resultado: " . nl2br(htmlspecialchars($evento['resultado']));
                         
                         } elseif ($evento['tipo_evento'] == 'diagnostico') {
-                            $detalhes = "CID-10: " . htmlspecialchars($evento['cid_10']) . 
-                                        "<br>Descrição: " . nl2br(htmlspecialchars($evento['descricao'])) .
-                                        "<br>Previsão: " . htmlspecialchars($evento['resultadoPrevisto']) . 
-                                        " (Probabilidade: " . htmlspecialchars($evento['probabilidade']) . "%)";
                         
+                        $cid = htmlspecialchars($evento['cid_10'] ?? 'N/A');
+                        $desc = nl2br(htmlspecialchars($evento['descricao'] ?? 'Sem descrição'));
+                        $previsao = htmlspecialchars($evento['resultadoPrevisto'] ?? 'Não informada');
+                        $prob = htmlspecialchars($evento['probabilidade'] ?? '0');
+
+                        $detalhes = "CID-10: " . $cid . 
+                                    "<br>Descrição: " . $desc .
+                                    "<br>Previsão: " . $previsao . 
+                                    " (Probabilidade: " . $prob . "%)";
                         }
 
 
