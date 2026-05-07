@@ -34,7 +34,7 @@ if (!isset($_SESSION['email_recuperacao'])) {
                         <strong><?php echo $_SESSION['email_recuperacao']; ?></strong>
                     </p>
 
-                    <form action="../controller/acoes.php" method="POST">
+                    <form action="../controller/AuthController.php" method="POST">
                         <div class="mb-4">
                             <label class="form-label d-block text-muted">Digite o código de 4 dígitos:</label>
                             <input type="text" name="codigo_verificacao" maxlength="4" placeholder="0000" required 

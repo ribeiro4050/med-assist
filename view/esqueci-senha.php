@@ -28,7 +28,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         Informe seu e-mail cadastrado para receber o código de verificação de 4 dígitos.
                     </p>
 
-                    <form action="../controller/acoes.php" method="POST">
+                    <form action="../controller/AuthController.php" method="POST">
                         <div class="mb-3">
                             <label for="email" class="form-label">E-mail cadastrado</label>
                             <input type="email" name="email" id="email" class="form-control" placeholder="exemplo@email.com" required>

@@ -23,7 +23,7 @@
                 <div class="card-body">
                     <?php include('../view/mensagem.php'); ?>
                     
-                    <form action="../controller/acoes.php" method="post">
+                    <form action="../controller/UsuarioController.php" method="post">
                         <h5 class="text-center text-primary mb-3">Dados Pessoais</h5>
                         
                         <div class="mb-3">

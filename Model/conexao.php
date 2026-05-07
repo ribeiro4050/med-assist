@@ -1,4 +1,5 @@
-<?php  
+<?php
+date_default_timezone_set('America/Sao_Paulo'); 
 define('HOST', 'localhost'); // alterar para o host do seu banco
 define('USUARIO', 'root'); // alterar para o usuario do seu banco
 define('SENHA', ''); // alterar para a senha do seu banco

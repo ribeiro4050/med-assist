@@ -64,7 +64,7 @@
                 <?php // Verificação de role para o botão Histórico para evitar repetição, mantendo apenas o bloco de teste original. ?>
                 
                 <li class="nav-item me-3">
-                    <a href="../controller/acoes.php?logout=true" class="btn btn-sm btn-outline-danger">Sair</a>
+                    <a href="../controller/AuthController.php?logout=true" class="btn btn-sm btn-outline-danger">Sair</a>
                 </li>
                 <li class="nav-item">
                     <a href="../view/perfil.php" class="nav-link">

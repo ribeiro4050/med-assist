@@ -58,7 +58,7 @@
                         <h4><i class="fas fa-notes-medical me-2"></i>Nova Triagem</h4>
                     </div>
                     <div class="card-body">
-                        <form action="../controller/acoes.php" method="POST">
+                        <form action="../controller/UsuarioController.php" method="POST">
                             
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Paciente</label>

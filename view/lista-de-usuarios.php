@@ -96,7 +96,7 @@ if(!isset($_SESSION['logado']) || $_SESSION['logado'] !== true || $_SESSION['rol
                       <!--icone de lapis-->
                       Editar</a>
 
-                      <form action="../controller/acoes.php" method="post" class="d-inline">
+                      <form action="../controller/UsuarioController.php" method="post" class="d-inline">
                         <button onclick="return confirm('Tem certeza que deseja excluir?')" type="submit" name="delete_usuario" value="<?= $usuario['id']?>" class="btn btn-danger btn-sm">
                           <span class="bi-trash3-fill"></span> &nbsp;
                           <!--icone de lixeira -->

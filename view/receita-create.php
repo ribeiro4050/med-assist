@@ -54,7 +54,7 @@
             </div>
             <div class="card-body">
               
-              <form action="../controller/acoes.php" method="POST">
+              <form action="../controller/ReceitaController.php" method="POST">
                 
                 <h5 class="mt-3 border-bottom pb-2">Informações Gerais</h5>
                 

@@ -36,7 +36,7 @@
                                     $usuario = mysqli_fetch_array($query);
                                 
                         ?>
-                        <form action="../controller/acoes.php" method="post">
+                        <form action="../controller/UsuarioController.php" method="post">
                             <input type="hidden" name="usuario_id" value="<?= $usuario['id']?>">
                             <div class="mb-3">
                                 <label for="">Nome</label>

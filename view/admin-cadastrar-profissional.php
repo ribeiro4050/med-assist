@@ -36,7 +36,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
                     </div>
                     
                     <div class="card-body p-4">
-                        <form action="../controller/acoes.php" method="POST">
+                        <form action="../controller/UsuarioController.php" method="POST">
                             
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -106,7 +106,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
             }
         }
     </script>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

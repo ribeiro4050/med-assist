@@ -34,7 +34,7 @@ if (!isset($_SESSION['pode_mudar_senha']) || !isset($_SESSION['email_recuperacao
                         Crie uma nova senha segura para acessar sua conta.
                     </p>
 
-                    <form action="../controller/acoes.php" method="POST">
+                    <form action="../controller/AuthController.php" method="POST">
                         <div class="mb-3">
                             <label for="nova_senha" class="form-label">Nova Senha</label>
                             <div class="input-group">
