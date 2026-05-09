@@ -8,6 +8,7 @@ $receitaService = new ReceitaService($conexao);
 if (isset($_POST['create_receita'])) {
     $medico_id = filtrar_sql($_POST['medico_id']);
     $paciente_id = filtrar_sql($_POST['paciente_id']);
+    $triagem_id = filtrar_sql($_POST['triagem_id'] ?? ''); // Captura o ID da triagem
     $timestamp = date('Y-m-d H:i:s');
     
     $token_assinatura = hash('sha256', $medico_id . $paciente_id . $timestamp);
@@ -31,7 +32,15 @@ if (isset($_POST['create_receita'])) {
 
     if ($resultado['sucesso']) {
         $_SESSION['mensagem'] = "Receita prescrita com sucesso!";
-        header('Location: ../view/receitas.php?id=' . $resultado['id']);
+        
+        // Lógica de Redirecionamento Inteligente
+        if (!empty($triagem_id)) {
+            // Se veio do Hub, volta para o Hub
+            header('Location: ../view/atendimento-hub.php?triagem_id=' . $triagem_id);
+        } else {
+            // Se não, vai para a listagem de receitas
+            header('Location: ../view/receitas.php?id=' . $resultado['id']);
+        }
     } else {
         $_SESSION['mensagem'] = "Erro ao criar receita: " . $resultado['erro'];
         header('Location: ../view/receita-create.php');

@@ -33,6 +33,14 @@
     $res_receita = mysqli_query($conexao, $sql_receita);
     $receita_recente = mysqli_fetch_assoc($res_receita);
 
+    // --- BUSCAR DIAGNÓSTICO RECENTE NA TABELA diagnostico ---
+    $sql_diag_recente = "SELECT id, data FROM diagnostico 
+                        WHERE triagem_id = '$triagem_id' 
+                        AND DATE(data) = CURDATE() 
+                        ORDER BY data DESC LIMIT 1";
+    $res_diag_recente = mysqli_query($conexao, $sql_diag_recente);
+    $diag_recente = mysqli_fetch_assoc($res_diag_recente);
+
     // Cálculos de idade
     $nascimento = new DateTime($t['data_nascimento']);
     $hoje = new DateTime();
@@ -112,15 +120,6 @@
             <span class="badge bg-primary">ID Triagem: #<?= $triagem_id ?></span>
         </div>
 
-        <?php if ($exame_recente): ?>
-            <div class="alert alert-success d-flex justify-content-between align-items-center shadow-sm mb-4 border-0 border-start border-success border-4">
-                <span><i class="fas fa-file-medical me-2"></i> Existem guias de exame geradas para este atendimento hoje.</span>
-                <a href="guia-exame-view.php?id=<?= $exame_recente['id'] ?>" class="btn btn-success btn-sm">
-                    <i class="fas fa-eye me-1"></i> Visualizar Última Guia
-                </a>
-            </div>
-        <?php endif; ?>
-
         <div class="row g-3 mb-4 text-center">
             <div class="col">
                 <div class="card h-100 shadow-sm border-indicador border-primary">
@@ -192,7 +191,7 @@
             </div>
 
             <div class="col-md-4">
-                <a href="receita-create.php?triagem_id=<?= $triagem_id ?>&paciente_id=<?= $t['paciente_id'] ?>" class="card card-atendimento h-100 shadow bg-primary text-white p-4">
+                <a href="receita-create.php?paciente_id=<?= $t['paciente_id']; ?>&triagem_id=<?= $t['id']; ?>" class="card card-atendimento h-100 shadow bg-primary text-white p-4">
                     <div class="card-body text-center">
                         <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex p-3 mb-3">
                             <i class="fas fa-pills fa-2x"></i>
@@ -221,18 +220,29 @@
             <h5 class="fw-bold mb-3"><i class="fas fa-file-alt me-2 text-primary"></i>Documentos Gerados Agora</h5>
             <div class="d-flex gap-3">
                 <?php if ($receita_recente): ?>
-                    <a href="receita-view.php?id=<?= $receita_recente['id'] ?>" target="_blank" class="btn btn-outline-primary rounded-pill">
+                    <a href="receita-view.php?id=<?= $receita_recente['id'] ?>" class="btn btn-outline-primary rounded-pill">
                         <i class="fas fa-print me-2"></i>Imprimir Receita
                     </a>
                 <?php endif; ?>
+                <?php if ($diag_recente): ?>
+                    <a href="diagnostico-view.php?id=<?= $diag_recente['id'] ?>" class="btn btn-outline-secondary rounded-pill">
+                        <i class="fas fa-print me-2"></i>Imprimir Diagnóstico
+                    </a>
+                <?php endif; ?>
                 <?php if ($exame_recente): ?>
-                    <a href="guia-exame-view.php?id=<?= $exame_recente['id'] ?>" target="_blank" class="btn btn-outline-info rounded-pill">
+                    <a href="guia-exame-view.php?id=<?= $exame_recente['id'] ?>" class="btn btn-outline-info rounded-pill">
                         <i class="fas fa-print me-2"></i>Imprimir Guia de Exame
                     </a>
                 <?php endif; ?>
             </div>
         </div>
         <?php endif; ?>
+
+        <?php if (!$exame_recente && !$receita_recente && !$diag_recente): ?>
+            <div class="text-center py-4">
+                <p class="text-muted">Nenhum documento foi gerado para este atendimento ainda.</p>
+            </div>
+        <?php endif; ?>            
 
         <div class="text-center mt-5">
             <form action="../controller/ExameController.php" method="POST" id="formFinalizar">
