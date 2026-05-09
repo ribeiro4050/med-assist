@@ -31,3 +31,23 @@ if (isset($_POST['create_triagem'])) {
     }
     exit;
 }
+
+// --- CHECKLIST DE ADMINISTRAÇÃO ---
+if (isset($_POST['registrar_administracao'])) {
+    $item_id = filtrar_sql($_POST['item_id']);
+    $paciente_id = filtrar_sql($_POST['paciente_id']);
+    $enfermeiro_id = $_SESSION['id_usuario']; // Seguindo seu padrão de nome de sessão
+    $status = filtrar_sql($_POST['status']); // Administrado, Recusado, etc.
+    $observacao = filtrar_sql($_POST['observacao']);
+
+    $resultado = $enfermagemService->registrarAdministracao($item_id, $enfermeiro_id, $paciente_id, $status, $observacao);
+
+    if ($resultado) {
+        $_SESSION['mensagem'] = "Administração registrada com sucesso!";
+    } else {
+        $_SESSION['mensagem'] = "Erro ao registrar administração.";
+    }
+    
+    header("Location: ../view/perfil.php?id=$paciente_id");
+    exit;
+}

@@ -82,4 +82,35 @@ class EnfermagemService {
         $resultado = mysqli_query($this->db, $sql);
         return mysqli_fetch_assoc($resultado);
     }
+
+    /**
+     * Busca o checklist de medicamentos prescritos para um paciente específico.
+     * Ajustado para os nomes exatos do banco: itens_receita e item_receita_id.
+     */
+    public function buscarChecklistPaciente($id_paciente) {
+        // Proteção contra SQL Injection
+        $id_paciente = mysqli_real_escape_string($this->db, $id_paciente);
+        
+        $sql = "SELECT 
+                    ir.id,
+                    ir.medicamento_nome,
+                    ir.concentracao,
+                    ir.posologia,
+                    u.nome as nome_medico,
+                    (SELECT COUNT(*) FROM administracao_medicamentos am 
+                     WHERE am.item_receita_id = ir.id 
+                     AND DATE(am.data_administracao) = CURDATE()) as ja_administrado
+                FROM itens_receita ir
+                JOIN receitas r ON ir.receita_id = r.id
+                JOIN usuarios u ON r.medico_id = u.id
+                WHERE r.paciente_id = '$id_paciente'";
+
+        $result = mysqli_query($this->db, $sql);
+        
+        if (!$result) {
+            die("Erro na Query do Checklist: " . mysqli_error($this->db));
+        }
+        
+        return $result;
+    }
 }

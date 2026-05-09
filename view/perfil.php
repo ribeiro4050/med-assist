@@ -17,27 +17,31 @@
     $query_receitas = null;
     $query_exames = null;
     $query_diagnosticos = null;
+    $dados_checklist = null;
 
     if ($role_usuario === 'paciente') {
-        // Busca Receitas (Tabela: receitas)
+        // Busca Receitas
         $sql_receitas = "SELECT r.id, r.data_prescricao, r.tipo_receita, m.nome AS nome_medico
                          FROM receitas r JOIN usuarios m ON r.medico_id = m.id
                          WHERE r.paciente_id = $usuario_id ORDER BY r.data_prescricao DESC";
         $query_receitas = mysqli_query($conexao, $sql_receitas);
 
-        // Busca Exames (No seu dump a tabela é 'exame' ou 'guia_exames')
-        // Vou usar 'guia_exames' pois é a que tem os campos que você exibiu anteriormente
+        // Busca Exames
         $sql_exames = "SELECT g.id, g.data_solicitacao, m.nome AS nome_medico 
                        FROM guia_exames g JOIN usuarios m ON g.medico_id = m.id
                        WHERE g.paciente_id = $usuario_id ORDER BY g.data_solicitacao DESC";
         $query_exames = mysqli_query($conexao, $sql_exames);
 
-        // CORREÇÃO AQUI: De 'diagnosticos' para 'diagnostico'
-        // E de 'data_diagnostico' para 'data' (conforme seu dump)
+        // Busca Diagnósticos
         $sql_diag = "SELECT d.id, d.data as data_diagnostico, d.cid_10, m.nome AS nome_medico 
                      FROM diagnostico d JOIN usuarios m ON d.medico_id = m.id
                      WHERE d.paciente_id = $usuario_id ORDER BY d.data DESC";
         $query_diagnosticos = mysqli_query($conexao, $sql_diag);
+        
+        // INSTANCIAÇÃO DO SERVICE PARA O CHECKLIST
+        require_once '../Model/EnfermagemService.php';
+        $enfermagemService = new EnfermagemService($conexao);
+        $dados_checklist = $enfermagemService->buscarChecklistPaciente($usuario_id);
     }
 ?>
 <!doctype html>
@@ -108,6 +112,9 @@
                                         <li class="nav-item">
                                             <button class="nav-link" id="diag-tab" data-bs-toggle="tab" data-bs-target="#diag" type="button">Diagnósticos</button>
                                         </li>
+                                        <li class="nav-item">
+                                            <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#administracao" type="button">Administração</button>
+                                        </li>
                                     </ul>
                                 </div>
                                 <div class="card-body tab-content" id="myTabContent">
@@ -119,7 +126,7 @@
                                                 <?php while($r = mysqli_fetch_array($query_receitas)): ?>
                                                 <tr>
                                                     <td><?= date('d/m/Y', strtotime($r['data_prescricao'])) ?></td>
-                                                    <td><?= $r['tipo_rece_ita'] ?? $r['tipo_receita'] ?></td>
+                                                    <td><?= $r['tipo_receita'] ?></td>
                                                     <td>Dr. <?= $r['nome_medico'] ?></td>
                                                     <td><a href="receita-view.php?id=<?= $r['id'] ?>" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> Ver</a></td>
                                                 </tr>
@@ -142,6 +149,52 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    
+                                    <div class="tab-pane fade" id="administracao" role="tabpanel">
+                                        <div class="card shadow-sm mt-3">
+                                            <div class="card-header bg-primary text-white">
+                                                <h5 class="mb-0"><i class="bi bi-pills"></i> Plano de Administração</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Medicamento</th>
+                                                            <th>Posologia</th>
+                                                            <th>Médico</th>
+                                                            <th>Status / Ações</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php if ($dados_checklist && mysqli_num_rows($dados_checklist) > 0): ?>
+                                                            <?php while($item = mysqli_fetch_array($dados_checklist)): ?>
+                                                            <tr>
+                                                                <td><strong><?= $item['medicamento_nome'] ?></strong> (<?= $item['concentracao'] ?>)</td>
+                                                                <td><?= $item['posologia'] ?></td>
+                                                                <td>Dr. <?= $item['nome_medico'] ?></td>
+                                                                <<td>
+                                                                    <?php if ($item['ja_administrado']): ?>
+                                                                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Administrado</span>
+                                                                    <?php else: ?>
+                                                                        <?php if ($role_usuario === 'enfermeiro'): ?>
+                                                                            <button class="btn btn-success btn-sm" onclick="abrirModalAdministracao(<?= $item['id'] ?>, '<?= $item['medicamento_nome'] ?>')">
+                                                                                Confirmar Dose
+                                                                            </button>
+                                                                        <?php else: ?>
+                                                                            <span class="badge bg-warning text-dark">Aguardando Administração</span>
+                                                                        <?php endif; ?>
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                            </tr>
+                                                            <?php endwhile; ?>
+                                                        <?php else: ?>
+                                                            <tr><td colspan="4" class="text-center">Nenhum medicamento pendente.</td></tr>
+                                                        <?php endif; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div> 
 
                                     <div class="tab-pane fade" id="diag" role="tabpanel">
                                         <table class="table table-hover">
@@ -149,7 +202,7 @@
                                             <tbody>
                                                 <?php while($d = mysqli_fetch_array($query_diagnosticos)): ?>
                                                 <tr>
-                                                    <td><?= date('d/m/Y', strtotime($d['data_diagnostico'])) ?></td>
+                                                    <td><?= date('d/m/Y', Caesar: strtotime($d['data_diagnostico'])) ?></td>
                                                     <td><span class="badge bg-danger"><?= $d['cid_10'] ?></span></td>
                                                     <td>Dr. <?= $d['nome_medico'] ?></td>
                                                     <td><a href="diagnostico-view.php?id=<?= $d['id'] ?>" class="btn btn-sm btn-outline-dark"><i class="bi bi-file-text"></i> Detalhes</a></td>
@@ -172,6 +225,40 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalAdmin" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="../controller/administracao-controller.php" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Administração</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="item_id" id="modal_item_id">
+                        <p>Confirmar a aplicação do medicamento: <strong id="modal_medicamento_nome"></strong>?</p>
+                        <div class="mb-3">
+                            <label>Observações (Opcional):</label>
+                            <textarea name="observacao" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" name="confirmar_dose" class="btn btn-primary">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function abrirModalAdministracao(id, nome) {
+        document.getElementById('modal_item_id').value = id;
+        document.getElementById('modal_medicamento_nome').innerText = nome;
+        var modalElement = document.getElementById('modalAdmin');
+        var meuModal = new bootstrap.Modal(modalElement);
+        meuModal.show();
+    }
+    </script>
   </body>
 </html>
