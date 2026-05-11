@@ -25,15 +25,19 @@ class ReceitaService {
             
             // Loop para inserir os itens (Usa a lógica que estava no acoes.php)
             foreach ($itens['nomes'] as $key => $nome) {
-                $nome_seguro = $nome; // Já vem filtrado pelo filtrar_sql no controller
+                $nome_seguro = $nome;
                 $conc = $itens['concentracoes'][$key];
                 $qtd = $itens['quantidades'][$key];
                 $pos = $itens['posologias'][$key];
+                // Captura as novas datas enviadas pelo Controller
+                $data_ini = $itens['datas_inicio'][$key]; 
+                $data_f = $itens['datas_fim'][$key];
 
                 if (empty($nome_seguro)) continue;
 
-                $sql_item = "INSERT INTO itens_receita (receita_id, medicamento_nome, concentracao, quantidade_total, posologia) 
-                             VALUES ('$receita_id', '$nome_seguro', '$conc', '$qtd', '$pos')";
+                // SQL atualizada com os campos data_inicio e data_fim
+                $sql_item = "INSERT INTO itens_receita (receita_id, medicamento_nome, concentracao, quantidade_total, posologia, data_inicio, data_fim) 
+                            VALUES ('$receita_id', '$nome_seguro', '$conc', '$qtd', '$pos', '$data_ini', '$data_f')";
                 
                 mysqli_query($this->db, $sql_item);
             }

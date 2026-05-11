@@ -8,8 +8,7 @@ class MedicoService {
     }
 
     public function listarFilaEspera() {
-        // Query robusta: busca dados do paciente e sinais vitais da triagem
-        // Certifique-se que estas colunas existem na sua tabela 'triagens'
+        // Query ajustada para as colunas reais do seu dump (triagens)
         $sql = "SELECT 
                     t.id as triagem_id, 
                     u.nome as paciente_nome, 
@@ -22,7 +21,7 @@ class MedicoService {
                     t.queixa_principal
                 FROM triagens t
                 JOIN usuarios u ON t.paciente_id = u.id
-                WHERE t.status = 'Aguardando Medico'
+                WHERE t.status = 'Aguardando Médico'
                 ORDER BY 
                     CASE 
                         WHEN t.classificacao_risco = 'Vermelho' THEN 1
@@ -34,12 +33,26 @@ class MedicoService {
                     END ASC, t.data_hora ASC";
                     
         $resultado = mysqli_query($this->db, $sql);
-        
-        if (!$resultado) {
-            // Se falhar, retorna false para o controller tratar
-            return false;
-        }
-        
         return $resultado;
+    }
+
+    public function buscarPrescricoesAtuais($id_paciente) {
+        $id_paciente = mysqli_real_escape_string($this->db, $id_paciente);
+        
+        $sql = "SELECT ir.*, r.data_prescricao, ir.data_inicio, ir.data_fim 
+            FROM itens_receita ir 
+            JOIN receitas r ON ir.receita_id = r.id 
+            WHERE r.paciente_id = '$id_paciente' 
+            ORDER BY r.data_prescricao DESC";
+                
+        return mysqli_query($this->db, $sql);
+    }
+
+    // DICA: Novo método para buscar a última triagem real do paciente para o prontuário
+    public function buscarUltimaTriagem($id_paciente) {
+        $id_paciente = mysqli_real_escape_string($this->db, $id_paciente);
+        $sql = "SELECT * FROM triagens WHERE paciente_id = '$id_paciente' ORDER BY data_hora DESC LIMIT 1";
+        $res = mysqli_query($this->db, $sql);
+        return mysqli_fetch_assoc($res);
     }
 }

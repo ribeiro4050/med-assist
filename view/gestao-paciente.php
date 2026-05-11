@@ -3,7 +3,7 @@ session_start();
 require '../Model/conexao.php';
 require_once '../Model/EnfermagemService.php';
 
-// 1. Verificação de Sessão (Mesma lógica do home-enfermeiro)
+// 1. Verificação de Sessão
 if (!isset($_SESSION['logado'])) {
     header("Location: login.php?erro=sessao_expirada");
     exit;
@@ -17,7 +17,7 @@ if ($_SESSION['role_usuario'] !== 'enfermeiro') {
 // 2. Pega o ID do paciente da URL
 $id_paciente = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// 3. Detecção Automática da Coluna de Role (Para evitar o Fatal Error)
+// 3. Detecção Automática da Coluna de Role
 $check_columns = mysqli_query($conexao, "SHOW COLUMNS FROM usuarios LIKE 'role_usuario'");
 $coluna_final = (mysqli_num_rows($check_columns) > 0) ? 'role_usuario' : 'role';
 
@@ -34,7 +34,6 @@ $res_p = mysqli_query($conexao, $sql_p);
 $p = mysqli_fetch_assoc($res_p);
 
 if (!$p) { 
-    // Se o ID for inválido ou não for paciente, volta para o painel em vez de deslogar
     header('Location: painel-internacao.php?erro=paciente_nao_encontrado'); 
     exit; 
 }
@@ -95,20 +94,40 @@ $dados_checklist = $enfermagemService->buscarChecklistPaciente($id_paciente);
                                 </thead>
                                 <tbody>
                                     <?php if ($dados_checklist && mysqli_num_rows($dados_checklist) > 0): ?>
-                                        <?php while($item = mysqli_fetch_assoc($dados_checklist)): ?>
-                                        <tr>
-                                            <td class="align-middle">
+                                        <?php while($item = mysqli_fetch_assoc($dados_checklist)): 
+                                            $hoje = date('Y-m-d');
+                                            $cancelado = !empty($item['justificativa_cancelamento']);
+                                            $expirado = ($hoje > $item['data_fim']);
+                                            $ja_tomou = ($item['ja_administrado'] > 0);
+                                            
+                                            // Define a classe da linha para dar destaque visual
+                                            $tr_class = $cancelado ? 'table-danger opacity-75' : ($expirado ? 'table-light' : '');
+                                        ?>
+                                        <tr class="<?= $tr_class ?>">
+                                            <td>
                                                 <strong><?= $item['medicamento_nome'] ?></strong><br>
                                                 <small class="text-muted"><?= $item['concentracao'] ?></small>
                                             </td>
-                                            <td class="align-middle"><?= $item['posologia'] ?></td>
-                                            <td class="align-middle">Dr(a). <?= $item['nome_medico'] ?? 'Não informado' ?></td>
-                                            <td class="align-middle text-center">
-                                                <?php if (isset($item['ja_administrado']) && $item['ja_administrado']): ?>
-                                                    <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Administrado</span>
+                                            <td><?= $item['posologia'] ?></td>
+                                            <td><?= $item['nome_medico'] ?></td>
+                                            <td class="text-center">
+                                                <?php if ($cancelado): ?>
+                                                    <span class="badge bg-danger d-block mb-1">INTERROMPIDO</span>
+                                                    <small class="text-danger" style="font-size: 0.7rem;">
+                                                        Motivo: <?= $item['justificativa_cancelamento'] ?>
+                                                    </small>
+
+                                                <?php elseif ($expirado): ?>
+                                                    <span class="badge bg-secondary d-block">TRATAMENTO ENCERRADO</span>
+                                                    <small class="text-muted" style="font-size: 0.7rem;">Finalizou em: <?= date('d/m/y', strtotime($item['data_fim'])) ?></small>
+
+                                                <?php elseif ($ja_tomou): ?>
+                                                    <span class="badge bg-success d-block mb-1">APLICADO HOJE</span>
+                                                    <small class="text-muted" style="font-size: 0.7rem;">Por: <?= $item['nome_enfermeiro'] ?></small>
+
                                                 <?php else: ?>
-                                                    <button class="btn btn-success btn-sm shadow-sm" onclick="abrirModalAdministracao(<?= $item['id'] ?>, '<?= $item['medicamento_nome'] ?>')">
-                                                        Confirmar Dose
+                                                   <button class="btn btn-success btn-sm w-100" onclick="abrirModalAdministracao(<?= $item['id'] ?>, '<?= addslashes($item['medicamento_nome']) ?>')">
+                                                        <i class="bi bi-check-circle"></i> Confirmar Dose
                                                     </button>
                                                 <?php endif; ?>
                                             </td>
@@ -131,7 +150,6 @@ $dados_checklist = $enfermagemService->buscarChecklistPaciente($id_paciente);
         </div>
     </div>
 
-    <!-- Modal de Confirmação -->
     <div class="modal fade" id="modalAdmin" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -142,7 +160,11 @@ $dados_checklist = $enfermagemService->buscarChecklistPaciente($id_paciente);
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="item_id" id="modal_item_id">
+                        <input type="hidden" name="enfermeiro_id" value="<?= $_SESSION['id_usuario'] ?>">
+                        
                         <p>Deseja confirmar a aplicação do medicamento: <strong id="modal_medicamento_nome"></strong>?</p>
+                        <p class="text-muted small">Registrando em nome de: <strong><?= $_SESSION['nome_usuario'] ?></strong></p>
+                        
                         <div class="mb-3">
                             <label class="form-label">Observações:</label>
                             <textarea name="observacao" class="form-control" rows="3" placeholder="Ex: Paciente aceitou bem a medicação..."></textarea>

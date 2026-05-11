@@ -48,6 +48,9 @@
             <div class="col-md-8">
                 <h2 class="fw-bold"><i class="fas fa-user-md me-2 text-primary"></i>Fila de Atendimento</h2>
             </div>
+            <a href="painel-internacao.php" class="btn btn-outline-primary shadow-sm mb-3">
+                <i class="fas fa-bed me-2"></i> Ver Pacientes Internados
+            </a>
             <div class="col-md-4 text-end">
                 <div class="p-3 bg-white shadow-sm rounded border">
                     <span class="h4 d-block mb-0 text-primary">

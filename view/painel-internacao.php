@@ -2,27 +2,24 @@
 session_start();
 require '../Model/conexao.php';
 
-// Debug temporário: se quiser ver o que tem na sua sessão, descomente a linha abaixo
-// print_r($_SESSION); exit;
-
-// Proteção: Note que aqui verificamos se existe a sessão e se o nível está correto
+// 1. Verificação de Sessão
 if (!isset($_SESSION['logado'])) {
     header("Location: login.php?erro=sessao_expirada");
     exit;
 }
 
-// Verifica se a role é enfermeiro. 
-// Use exatamente o mesmo nome que você usa no home-enfermeiro.php
-if ($_SESSION['role_usuario'] !== 'enfermeiro') {
+// 2. PERMISSÃO AMPLIADA: Aceita enfermeiro OU medico OU admin
+$roles_permitidos = ['enfermeiro', 'medico', 'admin'];
+
+if (!in_array($_SESSION['role_usuario'], $roles_permitidos)) {
     header("Location: login.php?erro=acesso_negado");
     exit;
 }
 
-// --- DETECÇÃO DA COLUNA ---
+// --- DETECÇÃO DA COLUNA DE ROLE ---
 $check_columns = mysqli_query($conexao, "SHOW COLUMNS FROM usuarios LIKE 'role_usuario'");
 $coluna_final = (mysqli_num_rows($check_columns) > 0) ? 'role_usuario' : 'role';
 
-// Se não for nenhuma das duas, tenta 'tipo'
 if ($coluna_final == 'role') {
     $check_role = mysqli_query($conexao, "SHOW COLUMNS FROM usuarios LIKE 'role'");
     if (mysqli_num_rows($check_role) == 0) {
@@ -32,14 +29,19 @@ if ($coluna_final == 'role') {
 
 $filtro_cpf = isset($_GET['busca_cpf']) ? mysqli_real_escape_string($conexao, $_GET['busca_cpf']) : '';
 
-// Query
+// 3. Query de Busca
 $sql = "SELECT id, nome, cpf, data_nascimento FROM usuarios WHERE $coluna_final = 'paciente'";
 if ($filtro_cpf != '') {
     $sql .= " AND cpf LIKE '%$filtro_cpf%'";
 }
 
 $query_pacientes = mysqli_query($conexao, $sql);
+
+// 4. Lógica de Redirecionamento Dinâmico
+// Define para qual página o usuário será enviado ao clicar no card
+$destino_clique = ($_SESSION['role_usuario'] === 'medico') ? 'prontuario-medico.php' : 'gestao-paciente.php';
 ?>
+
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -51,6 +53,7 @@ $query_pacientes = mysqli_query($conexao, $sql);
     <style>
         .card-paciente { transition: transform 0.2s; cursor: pointer; border-left: 5px solid #0d6efd; }
         .card-paciente:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .bg-medico { border-left-color: #6610f2 !important; } /* Cor diferenciada para destaque visual se necessário */
     </style>
 </head>
 <body class="bg-light">
@@ -60,7 +63,10 @@ $query_pacientes = mysqli_query($conexao, $sql);
         <div class="row mb-4">
             <div class="col-md-8">
                 <h3><i class="bi bi-hospital text-primary"></i> Painel de Internação</h3>
-                <p class="text-muted">Selecione um paciente para gerenciar medicamentos e prontuário.</p>
+                <p class="text-muted">
+                    Sessão atual: <span class="badge bg-secondary"><?= ucfirst($_SESSION['role_usuario']) ?></span>
+                    <br>Selecione um paciente para gerenciar o prontuário.
+                </p>
             </div>
             <div class="col-md-4">
                 <form action="" method="GET" class="d-flex">
@@ -71,11 +77,11 @@ $query_pacientes = mysqli_query($conexao, $sql);
         </div>
 
         <div class="row">
-            <?php if(mysqli_num_rows($query_pacientes) > 0): ?>
+            <?php if($query_pacientes && mysqli_num_rows($query_pacientes) > 0): ?>
                 <?php while($p = mysqli_fetch_assoc($query_pacientes)): ?>
                 <div class="col-md-4 mb-3">
-                    <!-- Ao clicar, leva o ID para a tela de gestão detalhada -->
-                    <div class="card h-100 card-paciente" onclick="location.href='gestao-paciente.php?id=<?= $p['id'] ?>'">
+                    <div class="card h-100 card-paciente <?= ($_SESSION['role_usuario'] === 'medico') ? 'bg-medico' : '' ?>" 
+                         onclick="location.href='<?= $destino_clique ?>?id=<?= $p['id'] ?>'">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="flex-shrink-0">
@@ -89,7 +95,10 @@ $query_pacientes = mysqli_query($conexao, $sql);
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0 text-end">
-                            <span class="text-primary small">Ver Detalhes e Prescrições <i class="bi bi-arrow-right"></i></span>
+                            <span class="text-primary small">
+                                <?= ($_SESSION['role_usuario'] === 'medico') ? 'Abrir Prontuário' : 'Gerenciar Medicamentos' ?> 
+                                <i class="bi bi-arrow-right"></i>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -97,7 +106,7 @@ $query_pacientes = mysqli_query($conexao, $sql);
             <?php else: ?>
                 <div class="col-12 text-center mt-5">
                     <i class="bi bi-person-exclamation fs-1 text-muted"></i>
-                    <p class="text-muted mt-2">Nenhum paciente encontrado.</p>
+                    <p class="text-muted mt-2">Nenhum paciente internado encontrado.</p>
                 </div>
             <?php endif; ?>
         </div>

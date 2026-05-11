@@ -87,30 +87,71 @@ class EnfermagemService {
      * Busca o checklist de medicamentos prescritos para um paciente específico.
      * Ajustado para os nomes exatos do banco: itens_receita e item_receita_id.
      */
-    public function buscarChecklistPaciente($id_paciente) {
-        // Proteção contra SQL Injection
+
+    public function buscarHistoricoCompletoPaciente($id_paciente) {
         $id_paciente = mysqli_real_escape_string($this->db, $id_paciente);
         
         $sql = "SELECT 
-                    ir.id,
                     ir.medicamento_nome,
                     ir.concentracao,
                     ir.posologia,
-                    u.nome as nome_medico,
+                    ir.data_inicio,
+                    ir.data_fim,
+                    ir.justificativa_cancelamento,
+                    am.data_administracao,
+                    u_enf.nome as nome_enfermeiro,
+                    am.status as status_dose
+                FROM itens_receita ir
+                LEFT JOIN administracao_medicamentos am ON ir.id = am.item_receita_id
+                LEFT JOIN usuarios u_enf ON am.enfermeiro_id = u_enf.id
+                JOIN receitas r ON ir.receita_id = r.id
+                WHERE r.paciente_id = '$id_paciente'
+                ORDER BY ir.data_inicio DESC, am.data_administracao DESC";
+
+        return mysqli_query($this->db, $sql);
+    }
+
+    public function listarResumoMedicacaoGeral() {
+        $sql = "SELECT 
+                    u.id, u.nome, u.cpf,
+                    COUNT(ir.id) as total_medicamentos,
+                    SUM(CASE WHEN (SELECT COUNT(*) FROM administracao_medicamentos am 
+                                WHERE am.item_receita_id = ir.id 
+                                AND DATE(am.data_administracao) = CURDATE()) > 0 THEN 1 ELSE 0 END) as doses_aplicadas
+                FROM usuarios u
+                JOIN receitas r ON u.id = r.paciente_id
+                JOIN itens_receita ir ON r.id = ir.receita_id
+                WHERE u.role = 'paciente' 
+                AND (ir.data_fim >= CURDATE() OR ir.data_fim IS NULL)
+                AND ir.justificativa_cancelamento IS NULL
+                GROUP BY u.id";
+        return mysqli_query($this->db, $sql);
+    }
+
+    /**
+     * Busca o checklist de medicação para o dia atual.
+     * Necessário para a página de gestão e perfil.
+     */
+    public function buscarChecklistPaciente($id_paciente) {
+        $id_paciente = mysqli_real_escape_string($this->db, $id_paciente);
+        
+        $sql = "SELECT 
+                    ir.*, 
+                    u_med.nome as nome_medico,
                     (SELECT COUNT(*) FROM administracao_medicamentos am 
                      WHERE am.item_receita_id = ir.id 
-                     AND DATE(am.data_administracao) = CURDATE()) as ja_administrado
+                     AND DATE(am.data_administracao) = CURDATE()) as ja_administrado,
+                    (SELECT u_enf.nome FROM administracao_medicamentos am
+                     JOIN usuarios u_enf ON am.enfermeiro_id = u_enf.id
+                     WHERE am.item_receita_id = ir.id 
+                     AND DATE(am.data_administracao) = CURDATE() LIMIT 1) as nome_enfermeiro
                 FROM itens_receita ir
                 JOIN receitas r ON ir.receita_id = r.id
-                JOIN usuarios u ON r.medico_id = u.id
-                WHERE r.paciente_id = '$id_paciente'";
+                JOIN usuarios u_med ON r.medico_id = u_med.id
+                WHERE r.paciente_id = '$id_paciente'
+                AND (ir.data_fim >= CURDATE() OR ir.data_fim IS NULL)";
 
-        $result = mysqli_query($this->db, $sql);
-        
-        if (!$result) {
-            die("Erro na Query do Checklist: " . mysqli_error($this->db));
-        }
-        
-        return $result;
+        return mysqli_query($this->db, $sql);
     }
+
 }

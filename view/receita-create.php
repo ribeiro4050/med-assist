@@ -100,6 +100,8 @@
                 
                 <h5 class="mt-5 mb-4 text-primary fw-bold border-bottom pb-2"><i class="bi bi-capsule me-2"></i>Medicamentos (Itens)</h5>
 
+
+
                 <div id="itens-container">
                     <div class="item-receita border p-4 mb-4 rounded-4 shadow-sm">
                         <div class="row">
@@ -112,6 +114,19 @@
                                 <input type="text" name="concentracao[]" class="form-control" placeholder="Ex: 500mg Comprimido" required>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-success">Início do Tratamento</label>
+                                <input type="date" name="data_inicio[]" class="form-control" value="<?= date('Y-m-d') ?>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold text-danger">Fim do Tratamento (Previsão)</label>
+                                <input type="date" name="data_fim[]" class="form-control" required>
+                                <small class="text-muted">Para uso contínuo, coloque uma data distante (ex: 1 ano).</small>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Quantidade Total</label>
                             <input type="text" name="quantidade_total[]" class="form-control" placeholder="Ex: 30 comprimidos" required>
@@ -124,6 +139,8 @@
                         </div>
                     </div>
                 </div>
+
+
 
                 <button type="button" id="add-item-btn" class="btn btn-outline-primary mb-5 rounded-pill px-4">
                     <i class="bi bi-plus-circle me-2"></i>Adicionar Outro Medicamento
@@ -182,4 +199,4 @@
     </script>
     </script>
   </body>
-</html>
+</html>r
