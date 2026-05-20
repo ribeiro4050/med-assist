@@ -110,7 +110,7 @@
                 <div class="card shadow">
                     <div class="card-header <?= $header_color ?> <?= $text_color ?>">
                         <h4 class="mb-0">
-                            Receituário #<?= $receita_id ?> (<?= $receita['tipo_receita'] ?>)
+                            Receituário (<?= $receita['tipo_receita'] ?>)
                             <a href="javascript:history.go(-1)" class="btn btn-light float-end">Voltar</a>
                         </h4>
                     </div>
@@ -167,11 +167,11 @@
                         </div>                        
                         
                         <div class="mt-4 pt-3 border-top no-print">
-                            <?php if($role === 'medico' && $receita['medico_id'] == $usuario_id): ?>
+                            <!-- <?php if($role === 'medico' && $receita['medico_id'] == $usuario_id): ?>
                                 <a href="receita-edit.php?id=<?= $receita_id ?>" class="btn btn-success">
                                     <span class="bi-pencil-fill"></span> Editar
                                 </a>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
 
                             <!-- Este botão agora aparece para Médico e Paciente -->
                             <button onclick="window.print()" class="btn btn-dark">

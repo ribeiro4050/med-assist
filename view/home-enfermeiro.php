@@ -90,18 +90,6 @@ $nome_user = explode(" ", $_SESSION['nome_usuario'])[0];
 
         <div class="row g-4">
             <div class="col-md-6">
-                <a href="lista-de-usuarios.php" class="card p-3 d-flex flex-row align-items-center card-menu border-0 shadow-sm h-100">
-                    <div class="icon-box text-secondary me-3 mb-0">
-                        <i class="bi bi-people" style="font-size: 2rem;"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-1 fw-bold">Gerenciar Pacientes</h6>
-                        <p class="small text-muted mb-0">Cadastrar, editar ou localizar prontuários.</p>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-6">
                 <a href="painel-internacao.php" class="card p-3 d-flex flex-row align-items-center card-menu border-0 shadow-sm h-100 border-start border-primary border-5">
                     <div class="icon-box text-primary me-3 mb-0">
                         <i class="bi bi-journal-medical" style="font-size: 2rem;"></i>

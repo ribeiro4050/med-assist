@@ -1,6 +1,7 @@
 <?php
     if (session_status() === PHP_SESSION_NONE) { session_start(); }
-    if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'medico') {
+
+    if (!isset($_SESSION['logado']) || ($_SESSION['role_usuario'] !== 'medico' && $_SESSION['role_usuario'] !== 'admin')) {
         header("Location: login.php"); exit;
     }
 

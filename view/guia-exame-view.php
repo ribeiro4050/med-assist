@@ -11,11 +11,11 @@
     $guia_id = mysqli_real_escape_string($conexao, $_GET['id']);
     
     // 2. Consulta SQL completa para trazer dados da Guia, Paciente e Médico
-    $sql = "SELECT g.*, p.nome AS nome_paciente, p.data_nascimento, 
-                   m.nome AS nome_medico, m.crm_registro
-            FROM guia_exames g
-            JOIN usuarios p ON g.paciente_id = p.id
-            JOIN usuarios m ON g.medico_id = m.id
+    $sql = "SELECT g.*, p.nome AS nome_paciente, p.data_nascimento, \r
+                   m.nome AS nome_medico, m.crm_registro\r
+            FROM guia_exames g\r
+            JOIN usuarios p ON g.paciente_id = p.id\r
+            JOIN usuarios m ON g.medico_id = m.id\r
             WHERE g.id = $guia_id";
     
     $query = mysqli_query($conexao, $sql);
@@ -26,6 +26,20 @@
         header('Location: painel-medico.php');
         exit;
     }
+
+    // =========================================================================
+    // VALIDAÇÃO DE SEGURANÇA SIMPLIFICADA (Anti-invasão / IDOR)
+    // =========================================================================
+    // Bloqueia se: Não estiver logado OU (Se for paciente E o ID logado for diferente do dono da guia)
+    if (
+        !isset($_SESSION['logado']) || 
+        ($_SESSION['role_usuario'] === 'paciente' && $_SESSION['id_usuario'] != $guia['paciente_id'])
+    ) {
+        $_SESSION['mensagem'] = "Acesso negado. Você não tem permissão para ver este documento.";
+        header("Location: login.php"); 
+        exit;
+    }
+    // =========================================================================
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +53,8 @@
         @media print {
             .no-print { display: none; }
             body { background-color: white !important; }
-            .card { border: none !important; shadow: none !important; }
+            /* Correção do CSS para sumir com o sublinhado amarelo do VS Code */
+            .card { border: none !important; box-shadow: none !important; }
         }
         .header-logo { font-size: 1.5rem; font-weight: bold; color: #0d6efd; }
     </style>
@@ -93,16 +108,15 @@
                 </div>
 
                 <div class="row mt-5 pt-3 border-top align-items-end">
-                    <div class="col-md-2">
+                    <div class="col-md-3 mx-auto text-center">
                         <?php 
-                            $token = $guia['token_assinatura'];
-                            $qr_size = "90x90"; // Tamanho pequeno conforme solicitado
-                            $google_chart_url = "https://chart.googleapis.com/chart?chs=$qr_size&cht=qr&chl=" . urlencode($token);
+                            // Remove espaços em branco ou quebras de linha invisíveis do token original
+                            $token = trim($guia['token_assinatura']);
                         ?>
-                        <img src="<?= $google_chart_url ?>" alt="QR Code" class="img-fluid border p-1 shadow-sm">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=<?= urlencode($token) ?>" alt="QR Code" class="img-fluid border p-1 shadow-sm mb-2" style="width: 100px; height: 100px;">
                     </div>
                     
-                    <div class="col-md-10 text-end">
+                    <div class="col-md-9 text-end">
                         <div class="mb-3">
                             <p class="mb-0 fw-bold"><?= htmlspecialchars($guia['nome_medico']) ?></p>
                             <p class="text-muted small mb-0">Médico Responsável | CRM: <?= $guia['crm_registro'] ?></p>
