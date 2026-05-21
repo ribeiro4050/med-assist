@@ -48,6 +48,6 @@ if (isset($_POST['registrar_administracao'])) {
         $_SESSION['mensagem'] = "Erro ao registrar administração.";
     }
     
-    header("Location: ../view/perfil.php?id=$paciente_id");
+    header("Location: ../view/gestao-paciente.php?id=$paciente_id");
     exit;
 }

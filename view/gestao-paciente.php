@@ -126,7 +126,7 @@ $dados_checklist = $enfermagemService->buscarChecklistPaciente($id_paciente);
                                                     <small class="text-muted" style="font-size: 0.7rem;">Por: <?= $item['nome_enfermeiro'] ?></small>
 
                                                 <?php else: ?>
-                                                   <button class="btn btn-success btn-sm w-100" onclick="abrirModalAdministracao(<?= $item['id'] ?>, '<?= addslashes($item['medicamento_nome']) ?>')">
+                                                   <button class="btn btn-success btn-sm w-100" onclick="abrirModalAdministracao(<?= $item['item_id'] ?>, '<?= addslashes($item['medicamento_nome']) ?>')">
                                                         <i class="bi bi-check-circle"></i> Confirmar Dose
                                                     </button>
                                                 <?php endif; ?>
@@ -153,28 +153,30 @@ $dados_checklist = $enfermagemService->buscarChecklistPaciente($id_paciente);
     <div class="modal fade" id="modalAdmin" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="../controller/administracao-controller.php" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirmar Administração</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="item_id" id="modal_item_id">
-                        <input type="hidden" name="enfermeiro_id" value="<?= $_SESSION['id_usuario'] ?>">
-                        
-                        <p>Deseja confirmar a aplicação do medicamento: <strong id="modal_medicamento_nome"></strong>?</p>
-                        <p class="text-muted small">Registrando em nome de: <strong><?= $_SESSION['nome_usuario'] ?></strong></p>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Observações:</label>
-                            <textarea name="observacao" class="form-control" rows="3" placeholder="Ex: Paciente aceitou bem a medicação..."></textarea>
+                    <form action="../controller/EnfermagemController.php" method="POST">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Confirmar Administração</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" name="confirmar_dose" class="btn btn-primary">Confirmar Aplicação</button>
-                    </div>
-                </form>
+                        <div class="modal-body">
+                            <input type="hidden" name="item_id" id="modal_item_id">
+                            <input type="hidden" name="paciente_id" value="<?= $id_paciente ?>">
+                            <input type="hidden" name="status" value="Administrado">
+                            <input type="hidden" name="enfermeiro_id" value="<?= $_SESSION['id_usuario'] ?>">
+                            
+                            <p>Deseja confirmar a aplicação do medicamento: <strong id="modal_medicamento_nome"></strong>?</p>
+                            <p class="text-muted small">Registrando em nome de: <strong><?= $_SESSION['nome_usuario'] ?></strong></p>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Observações:</label>
+                                <textarea name="observacao" class="form-control" rows="3" placeholder="Ex: Paciente aceitou bem a medicação..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" name="registrar_administracao" class="btn btn-primary">Confirmar Aplicação</button>
+                        </div>
+                    </form>
             </div>
         </div>
     </div>

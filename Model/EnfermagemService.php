@@ -137,6 +137,7 @@ class EnfermagemService {
         
         $sql = "SELECT 
                     ir.*, 
+                    ir.id AS item_id,
                     u_med.nome as nome_medico,
                     (SELECT COUNT(*) FROM administracao_medicamentos am 
                      WHERE am.item_receita_id = ir.id 
@@ -149,7 +150,27 @@ class EnfermagemService {
                 JOIN receitas r ON ir.receita_id = r.id
                 JOIN usuarios u_med ON r.medico_id = u_med.id
                 WHERE r.paciente_id = '$id_paciente'
-                AND (ir.data_fim >= CURDATE() OR ir.data_fim IS NULL)";
+                AND (ir.data_fim >= CURDATE() OR ir.data_fim IS NULL)
+                GROUP BY ir.id";
+
+        return mysqli_query($this->db, $sql);
+    }
+
+    /**
+     * Registra a administração de um medicamento no banco de dados.
+     */
+    public function registrarAdministracao($item_id, $enfermeiro_id, $paciente_id, $status, $observacao) {
+        $item_id       = mysqli_real_escape_string($this->db, $item_id);
+        $enfermeiro_id = mysqli_real_escape_string($this->db, $enfermeiro_id);
+        $paciente_id   = mysqli_real_escape_string($this->db, $paciente_id);
+        $status        = mysqli_real_escape_string($this->db, $status);
+        $observacao    = mysqli_real_escape_string($this->db, $observacao);
+        
+        $obs_val = empty($observacao) ? "NULL" : "'$observacao'";
+
+        $sql = "INSERT INTO administracao_medicamentos 
+                (item_receita_id, enfermeiro_id, paciente_id, data_administracao, status, observacao) 
+                VALUES ('$item_id', '$enfermeiro_id', '$paciente_id', NOW(), '$status', $obs_val)";
 
         return mysqli_query($this->db, $sql);
     }
