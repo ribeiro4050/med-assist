@@ -1,35 +1,29 @@
 <?php
 session_start();
-// Caminhos ajustados para a estrutura do seu TCC (med-assist/controller/...)
 require_once '../Model/conexao.php'; 
+require_once '../Model/ReceitaService.php'; // Incluído para respeitar o MVC
 require_once '../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 if (isset($_GET['id'])) {
-    // Usa sua função de segurança que já existe no conexao.php
     $id_receita = filtrar_sql($_GET['id']); 
 
-    try {
-        // 1. Busca dados do Paciente e da Receita no medassistdb
-        $sql = "SELECT r.*, u.nome as paciente_nome, u.email as paciente_email 
-                FROM receitas r 
-                JOIN usuarios u ON r.paciente_id = u.id 
-                WHERE r.id = '$id_receita'";
-        
-        $resultado = mysqli_query($conexao, $sql);
-        $receita = mysqli_fetch_assoc($resultado);
+    $receitaService = new ReceitaService($conexao);
 
-        if (!$receita) {
+    try {
+        // 1 e 2. Busca os dados centralizados vindos do Model
+        $dadosReceita = $receitaService->buscarDadosParaEnvio($id_receita);
+
+        if (!$dadosReceita) {
             $_SESSION['mensagem'] = "Receita não encontrada ou dados do paciente incompletos.";
             header("Location: ../view/receitas.php");
             exit;
         }
 
-        // 2. Busca os Itens (Medicamentos) dessa receita específica
-        $sql_itens = "SELECT * FROM itens_receita WHERE receita_id = '$id_receita'";
-        $itens_resultado = mysqli_query($conexao, $sql_itens);
+        $receita = $dadosReceita['receita'];
+        $itens_resultado = $dadosReceita['itens'];
 
         // 3. Monta o Corpo do E-mail em HTML (Didática visual limpa)
         $corpoHTML = "

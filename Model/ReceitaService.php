@@ -46,4 +46,44 @@ class ReceitaService {
 
         return ['sucesso' => false, 'erro' => mysqli_error($this->db)];
     }
+
+    public function buscarDadosParaEnvio($id_receita) {
+        $id_limpo = mysqli_real_escape_string($this->db, $id_receita); // Caso use propriedade $this->db ou ajuste para sua propriedade de conexao
+        
+        $sql = "SELECT r.*, u.nome as paciente_nome, u.email as paciente_email 
+                FROM receitas r 
+                JOIN usuarios u ON r.paciente_id = u.id 
+                WHERE r.id = '$id_limpo'";
+        
+        $resultado = mysqli_query($this->db, $sql);
+        $receita = mysqli_fetch_assoc($resultado);
+
+        if (!$receita) {
+            return null;
+        }
+
+        $sql_itens = "SELECT * FROM itens_receita WHERE receita_id = '$id_limpo'";
+        $itens_resultado = mysqli_query($this->db, $sql_itens);
+
+        return [
+            'receita' => $receita,
+            'itens' => $itens_resultado
+        ];
+    }
+
+    public function cancelarItemReceita($item_id, $justificativa) {
+        $item_id_seguro = (int)$item_id;
+        $justificativa_segura = mysqli_real_escape_string($this->db, $justificativa);
+        $data_hoje = date('Y-m-d H:i:s');
+
+        $sql = "UPDATE itens_receita SET 
+                data_fim = '$data_hoje', 
+                justificativa_cancelamento = '$justificativa_segura' 
+                WHERE id = $item_id_seguro";
+
+        if (mysqli_query($this->db, $sql)) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once '../Model/conexao.php';
-require_once '../Model/EnfermagemService.php';
 
 // Segurança: Apenas administradores/gerentes
 if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
@@ -9,7 +8,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
     exit;
 }
 
-$enfermagemService = new EnfermagemService($conexao);
-$pacientes = $enfermagemService->listarResumoMedicacaoGeral();
-
-// Se houver necessidade de processar alguma ação específica do gerente antes de carregar a página, faríamos aqui.
+// O Controller aguarda ações/comandos específicos vindos por POST (Ex: alterar status, limpar logs, etc)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Lógicas de ação de auditoria entrarão aqui futuramente
+}

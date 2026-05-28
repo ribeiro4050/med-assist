@@ -1,13 +1,16 @@
 <?php
 session_start();
 require_once '../Model/conexao.php';
+require_once '../Model/UsuarioService.php';
+
+$usuarioService = new UsuarioService($conexao);
 
 // --- 1. LÓGICA DE CRIAÇÃO (CREATE) ---
-if(isset($_POST['create_usuario'])){
-    $nome = filtrar_sql($_POST['nome']);
-    $email = filtrar_sql($_POST['email']);
-    $cpf = filtrar_sql($_POST['cpf']);
-    $data_nascimento = filtrar_sql($_POST['data_nascimento']);
+if (isset($_POST['create_usuario'])) {
+    $nome = mysqli_real_escape_string($conexao, $_POST['nome']);
+    $email = mysqli_real_escape_string($conexao, $_POST['email']);
+    $cpf = mysqli_real_escape_string($conexao, $_POST['cpf']);
+    $data_nascimento = mysqli_real_escape_string($conexao, $_POST['data_nascimento']);
     
     $senha_pura = trim($_POST['senha']);
     $senha_confirmar = trim($_POST['senha_confirmar']);
@@ -19,24 +22,19 @@ if(isset($_POST['create_usuario'])){
     }
 
     $senha_hash = !empty($senha_pura) ? password_hash($senha_pura, PASSWORD_DEFAULT) : '';
-    $role = filtrar_sql($_POST['role'] ?? 'paciente');
-    $crm_registro = filtrar_sql($_POST['crm_registro'] ?? '');
-    $coren_registro = filtrar_sql($_POST['coren_registro'] ?? '');
+    $role = mysqli_real_escape_string($conexao, $_POST['role'] ?? 'paciente');
+    $crm_registro = mysqli_real_escape_string($conexao, $_POST['crm_registro'] ?? '');
+    $coren_registro = mysqli_real_escape_string($conexao, $_POST['coren_registro'] ?? '');
 
-    $sql = "INSERT INTO usuarios (nome, email, cpf, data_nascimento, senha, role, crm_registro, coren_registro) 
-            VALUES ('$nome', '$email', '$cpf', '$data_nascimento', '$senha_hash', '$role', ";
-    $sql .= empty($crm_registro) ? "NULL, " : "'$crm_registro', ";
-    $sql .= empty($coren_registro) ? "NULL)" : "'$coren_registro')";
+    $resultado = $usuarioService->salvarUsuario($nome, $email, $cpf, $data_nascimento, $senha_hash, $role, $crm_registro, $coren_registro);
 
-    try {
-        if(mysqli_query($conexao, $sql)) { 
-            $_SESSION['mensagem'] = "Usuário criado com sucesso!";
-            $location = (isset($_SESSION['logado']) && $_SESSION['role_usuario'] !== 'paciente') ? 'lista-de-usuarios.php' : 'login.php';
-            header("Location: ../view/$location");
-            exit;
-        }
-    } catch (mysqli_sql_exception $e) {
-        $_SESSION['mensagem'] = ($e->getCode() === 1062) ? "Erro: CPF ou E-mail já cadastrado." : "Erro ao criar usuário.";
+    if ($resultado['sucesso']) { 
+        $_SESSION['mensagem'] = "Usuário criado com sucesso!";
+        $location = (isset($_SESSION['logado']) && $_SESSION['role_usuario'] !== 'paciente') ? 'lista-de-usuarios.php' : 'login.php';
+        header("Location: ../view/$location");
+        exit;
+    } else {
+        $_SESSION['mensagem'] = ($resultado['codigo_erro'] === 1062) ? "Erro: CPF ou E-mail já cadastrado." : "Erro ao criar usuário.";
         header('Location: ../view/usuario-create.php');
         exit;
     }
@@ -44,41 +42,44 @@ if(isset($_POST['create_usuario'])){
 
 // --- 2. CADASTRO DE PROFISSIONAL (ADMIN) ---
 if (isset($_POST['cadastrar_profissional'])) {
-    if ($_SESSION['role_usuario'] !== 'admin') {
-        $_SESSION['mensagem'] = "Acesso negado.";
+    // CAMADA RIGOROSA DE SEGURANÇA: Verifica se está logado E se possui nível de Admin
+    if (!isset($_SESSION['logado']) || !isset($_SESSION['role_usuario']) || $_SESSION['role_usuario'] !== 'admin') {
+        $_SESSION['mensagem'] = "Acesso negado. Apenas administradores autorizados podem realizar esta ação.";
         header('Location: ../view/login.php');
         exit;
     }
 
-    $nome = filtrar_sql($_POST['nome']);
-    $email = filtrar_sql($_POST['email']);
-    $cpf = filtrar_sql($_POST['cpf']);
-    $role = filtrar_sql($_POST['role_usuario']);
-    $registro = filtrar_sql($_POST['registro_profissional']);
-    $senha_hash = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+    $nome = mysqli_real_escape_string($conexao, $_POST['nome']);
+    $email = mysqli_real_escape_string($conexao, $_POST['email']);
+    $cpf = mysqli_real_escape_string($conexao, $_POST['cpf']);
+    $data_nascimento = mysqli_real_escape_string($conexao, $_POST['data_nascimento']); // Injeção corrigida aqui!
+    $role = mysqli_real_escape_string($conexao, $_POST['role_usuario']);
+    $registro = mysqli_real_escape_string($conexao, $_POST['registro_profissional']);
+    
+    $senha_pura = trim($_POST['senha']);
+    $senha_hash = password_hash($senha_pura, PASSWORD_DEFAULT);
 
+    // Mapeia a coluna correta de acordo com a regra de negócio
     $coluna_registro = ($role === 'medico') ? 'crm_registro' : 'coren_registro';
 
-    $sql = "INSERT INTO usuarios (nome, email, cpf, senha, role, $coluna_registro) 
-            VALUES ('$nome', '$email', '$cpf', '$senha_hash', '$role', '$registro')";
-
-    try {
-        if (mysqli_query($conexao, $sql)) {
-            $_SESSION['mensagem'] = "Profissional cadastrado com sucesso!";
-            header('Location: ../view/admin-painel.php');
-            exit;
-        }
-    } catch (mysqli_sql_exception $e) {
-        $_SESSION['mensagem'] = "Erro ao cadastrar profissional.";
+    // Chama o método atualizado do Service injetando a data de nascimento
+    if ($usuarioService->cadastrarProfissional($nome, $email, $cpf, $data_nascimento, $senha_hash, $role, $coluna_registro, $registro)) {
+        $_SESSION['mensagem'] = "Profissional cadastrado com sucesso!";
+        header('Location: ../view/admin-painel.php');
+        exit;
+    } else {
+        $_SESSION['mensagem'] = "Erro ao cadastrar profissional no sistema.";
         header('Location: ../view/admin-cadastrar-profissional.php');
         exit;
     }
 }
 
 // --- 3. ATUALIZAÇÃO (UPDATE) ---
-if(isset($_POST['update_usuario'])){
-    $usuario_id = filtrar_sql($_POST['usuario_id']);
-    $pode_editar = ($_SESSION['role_usuario'] !== 'paciente' || $_SESSION['id_usuario'] == $usuario_id);
+if (isset($_POST['update_usuario'])) {
+    $usuario_id = mysqli_real_escape_string($conexao, $_POST['usuario_id']);
+    
+    // Trava de segurança: impede que usuários alterem perfis alheios (autenticação mútua)
+    $pode_editar = (isset($_SESSION['logado']) && ($_SESSION['role_usuario'] !== 'paciente' || $_SESSION['id_usuario'] == $usuario_id));
 
     if (!$pode_editar) {
         $_SESSION['mensagem'] = "Acesso negado.";
@@ -86,10 +87,10 @@ if(isset($_POST['update_usuario'])){
         exit;
     }
 
-    $nome = filtrar_sql($_POST['nome']);
-    $email = filtrar_sql($_POST['email']);
-    $cpf = filtrar_sql($_POST['cpf']);
-    $data_nascimento = filtrar_sql($_POST['data_nascimento']);
+    $nome = mysqli_real_escape_string($conexao, $_POST['nome']);
+    $email = mysqli_real_escape_string($conexao, $_POST['email']);
+    $cpf = mysqli_real_escape_string($conexao, $_POST['cpf']);
+    $data_nascimento = mysqli_real_escape_string($conexao, $_POST['data_nascimento']);
     $senha = $_POST['senha'];
     $senha_confirmar = $_POST['senha_confirmar'] ?? '';
 
@@ -99,22 +100,9 @@ if(isset($_POST['update_usuario'])){
         exit;
     }
 
-    $sql = "UPDATE usuarios SET nome = '$nome', email = '$email', cpf = '$cpf', data_nascimento = '$data_nascimento'";
-    
-    if(!empty($senha)){
-        $sql .= ", senha = '". password_hash($senha, PASSWORD_DEFAULT) . "'";
-    }
-    $sql .= " WHERE id = $usuario_id";
-
-    if(mysqli_query($conexao, $sql)){ 
+    if ($usuarioService->atualizarUsuario($usuario_id, $nome, $email, $cpf, $data_nascimento, $senha)) { 
         $_SESSION['mensagem'] = "Atualização feita com sucesso!";
-
-        if ($_SESSION['id_usuario'] == $usuario_id) {
-            $location = 'perfil.php';
-        } else {
-            $location = 'lista-de-usuarios.php';
-        }
-
+        $location = ($_SESSION['id_usuario'] == $usuario_id) ? 'perfil.php' : 'lista-de-usuarios.php';
         header("Location: ../view/$location"); 
         exit;
     } else {
@@ -125,52 +113,21 @@ if(isset($_POST['update_usuario'])){
 }
 
 // --- 4. EXCLUSÃO (DELETE) ---
-if(isset($_POST['delete_usuario'])){
-    if ($_SESSION['role_usuario'] !== 'admin') {
+if (isset($_POST['delete_usuario'])) {
+    // Trava de segurança: Somente administradores logados podem usar este método
+    if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
         $_SESSION['mensagem'] = "Acesso negado. Apenas administradores podem excluir usuários.";
         header('Location: ../view/index.php');
         exit;
     }
 
-    $usuario_id = filtrar_sql($_POST['delete_usuario']);
-    $sql = "DELETE FROM usuarios WHERE id = '$usuario_id'";
+    $usuario_id = mysqli_real_escape_string($conexao, $_POST['delete_usuario']);
 
-    if(mysqli_query($conexao, $sql)) {
-        $_SESSION['mensagem'] = "Usuário deletado com sucesso";
+    if ($usuarioService->deletarUsuario($usuario_id)) {
+        $_SESSION['mensagem'] = "Usuário deletado com sucesso!";
     } else {
         $_SESSION['mensagem'] = "Erro ao deletar usuário.";
     }
     header('Location: ../view/lista-de-usuarios.php');
-    exit;
-}
-
-// --- LÓGICA DE CRIAÇÃO DE TRIAGEM ---
-if (isset($_POST['create_triagem'])) {
-    require_once '../Model/EnfermagemService.php';
-    $enfermagemService = new EnfermagemService($conexao);
-
-    $dados_triagem = [
-        'paciente_id'         => filtrar_sql($_POST['paciente_id']),
-        'enfermeiro_id'       => $_SESSION['id_usuario'], 
-        'queixa_principal'    => filtrar_sql($_POST['queixa_principal']),
-        'pressao_sistolica'   => filtrar_sql($_POST['pressao_sistolica']),
-        'pressao_diastolica'  => filtrar_sql($_POST['pressao_diastolica']),
-        'temperatura'         => filtrar_sql($_POST['temperatura']),
-        'peso'                => filtrar_sql($_POST['peso']),
-        'altura'              => filtrar_sql($_POST['altura']),
-        'frequencia_cardiaca' => filtrar_sql($_POST['frequencia_cardiaca']),
-        'saturacao'           => filtrar_sql($_POST['saturacao']),
-        'classificacao_risco' => filtrar_sql($_POST['classificacao_risco'])
-    ];
-
-    $resultado = $enfermagemService->salvarTriagem($dados_triagem);
-
-    if ($resultado['sucesso']) {
-        $_SESSION['mensagem'] = "Triagem realizada com sucesso!";
-        header('Location: ../view/painel-enfermagem.php');
-    } else {
-        $_SESSION['mensagem'] = "Erro na triagem: " . $resultado['erro'];
-        header('Location: ../view/triagem-create.php');
-    }
     exit;
 }

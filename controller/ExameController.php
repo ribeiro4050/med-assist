@@ -32,7 +32,6 @@ class ExameController {
         exit;
     }
 
-    // MÉTODO ATUALIZADO: Agora altera o status no banco de dados
     public function finalizarAtendimento($post) {
         $triagem_id = $post['triagem_id'];
 

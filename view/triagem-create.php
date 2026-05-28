@@ -9,11 +9,12 @@
     }
 
     require_once '../Model/conexao.php';
+    require_once '../Model/UsuarioService.php';
     include('mensagem.php');
 
-    // Busca todos os pacientes para o <select>
-    $sql_pacientes = "SELECT id, nome FROM usuarios WHERE role = 'paciente' ORDER BY nome ASC";
-    $query_pacientes = mysqli_query($conexao, $sql_pacientes);
+    // Instancia o serviço especialista para encapsular o SQL longe da View
+    $usuarioService = new UsuarioService($conexao);
+    $query_pacientes = $usuarioService->buscarPacientesParaSelect();
 ?>
 
 <!DOCTYPE html>
@@ -21,27 +22,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Realizar Triagem - MedAssist</title>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> <!-- para buscas mais eficientes -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
    <style>
-    /* 1. Estado Normal: Apenas a borda e o texto laranja */
     .btn-outline-orange {
         color: #fd7e14;
         border-color: #fd7e14;
         background-color: transparent;
     }
 
-    /* 2. Remove o efeito de hover (passar o mouse) */
-    /* Forçamos o fundo a continuar transparente e o texto laranja */
     .btn-outline-orange:hover {
         background-color: transparent !important;
         color: #fd7e14 !important;
         border-color: #fd7e14 !important;
     }
 
-    /* 3. Estado Selecionado (Clicado): Aqui sim ele ganha cor */
     .btn-check:checked + .btn-outline-orange {
         background-color: #fd7e14 !important;
         color: #fff !important;
@@ -58,7 +55,7 @@
                         <h4><i class="fas fa-notes-medical me-2"></i>Nova Triagem</h4>
                     </div>
                     <div class="card-body">
-                        <form action="../controller/UsuarioController.php" method="POST">
+                        <form action="../controller/EnfermagemController.php" method="POST">
                             
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Paciente</label>
@@ -119,8 +116,7 @@
                                     <label class="btn btn-outline-warning" for="amarelo">Urgente</label>
 
                                     <input type="radio" class="btn-check" name="classificacao_risco" id="laranja" value="Laranja">
-                                    <label class="btn btn-outline-orange"
-                                    for="laranja">Muito urgente</label>
+                                    <label class="btn btn-outline-orange" for="laranja">Muito urgente</label>
 
                                     <input type="radio" class="btn-check" name="classificacao_risco" id="vermelho" value="Vermelho">
                                     <label class="btn btn-outline-danger" for="vermelho">Emergência</label>

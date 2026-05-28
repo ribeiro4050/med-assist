@@ -25,9 +25,9 @@ if (isset($_POST['create_receita'])) {
         'nomes' => array_map('filtrar_sql', $_POST['medicamento_nome']),
         'concentracoes' => array_map('filtrar_sql', $_POST['concentracao']),
         'quantidades' => array_map('filtrar_sql', $_POST['quantidade_total']),
-        'posologias' => array_map('filtrar_sql', $_POST['posologia']), // Adicionada a vírgula aqui!
-        'datas_inicio' => array_map('filtrar_sql', $_POST['data_inicio']), // Plural para manter o padrão
-        'datas_fim' => array_map('filtrar_sql', $_POST['data_fim'])        // Plural para manter o padrão
+        'posologias' => array_map('filtrar_sql', $_POST['posologia']),
+        'datas_inicio' => array_map('filtrar_sql', $_POST['data_inicio']),
+        'datas_fim' => array_map('filtrar_sql', $_POST['data_fim'])
     ];
 
     $resultado = $receitaService->criarReceita($dados_receita, $itens_receita);
@@ -50,20 +50,13 @@ if (isset($_POST['create_receita'])) {
 if (isset($_POST['cancelar_item'])) {
     $item_id = (int)$_POST['item_id'];
     $paciente_id = (int)$_POST['paciente_id'];
-    // Use o nome da função de filtro que você já tem (provavelmente filtrar_sql)
-    $justificativa = mysqli_real_escape_string($conexao, $_POST['justificativa']);
-    $data_hoje = date('Y-m-d H:i:s');
+    $justificativa = $_POST['justificativa']; // Repassado limpo, o Model fará o escape seguro
 
-    // Atualiza a data_fim para o momento exato do cancelamento e salva o motivo
-    $sql = "UPDATE itens_receita SET 
-            data_fim = '$data_hoje', 
-            justificativa_cancelamento = '$justificativa' 
-            WHERE id = $item_id";
-
-    if (mysqli_query($conexao, $sql)) {
+    // Executa a interrupção através da camada especialista Model
+    if ($receitaService->cancelarItemReceita($item_id, $justificativa)) {
         $_SESSION['mensagem'] = "O medicamento foi interrompido com sucesso.";
     } else {
-        $_SESSION['mensagem'] = "Erro ao interromper: " . mysqli_error($conexao);
+        $_SESSION['mensagem'] = "Erro ao interromper o medicamento no servidor.";
     }
 
     // Redireciona de volta para o prontuário do paciente específico

@@ -1,33 +1,8 @@
-<?php
+<?php 
     if (session_status() === PHP_SESSION_NONE) { session_start(); }
-    
-    require_once '../Model/conexao.php';
 
-    // Captura o ID do diagnóstico enviado na URL
-    $id = $_GET['id'] ?? '';
-
-    if (empty($id)) {
-        $_SESSION['mensagem'] = "ID do diagnóstico não fornecido.";
-        header("Location: painel-medico.php"); exit;
-    }
-
-    // Busca os dados completos do diagnóstico, paciente e médico no banco
-    $id = mysqli_real_escape_string($conexao, $id);
-    $sql = "SELECT d.id, d.data, d.cid_10, d.descricao, d.paciente_id, \r
-                   u_pac.nome as paciente_nome, \r
-                   u_med.nome as medico_nome \r
-            FROM diagnostico d\r
-            JOIN usuarios u_pac ON d.paciente_id = u_pac.id\r
-            JOIN usuarios u_med ON d.medico_id = u_med.id\r
-            WHERE d.id = '$id' LIMIT 1";
-    
-    $res = mysqli_query($conexao, $sql);
-    $diag = mysqli_fetch_assoc($res);
-
-    if (!$diag) {
-        $_SESSION['mensagem'] = "Diagnóstico não encontrado.";
-        header("Location: painel-medico.php"); exit;
-    }
+    // Carrega o controlador para obter os dados processados do laudo ($diag)
+    require_once '../controller/DiagnosticoController.php'; 
 
     // =========================================================================
     // VALIDAÇÃO DE SEGURANÇA SIMPLIFICADA (Anti-invasão / IDOR)
@@ -43,7 +18,6 @@
     }
     // =========================================================================
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -55,7 +29,6 @@
         @media print {
             .no-print { display: none; }
             body { background-color: white !important; }
-            /* Correção do CSS para sumir o sublinhado amarelo do VS Code */
             .card { border: none !important; box-shadow: none !important; }
         }
         .header-logo { font-size: 1.5rem; font-weight: bold; color: #0d6efd; }

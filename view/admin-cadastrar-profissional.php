@@ -51,6 +51,17 @@ if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
+                                    <label class="form-label fw-bold">Data de Nascimento</label>
+                                    <input type="date" name="data_nascimento" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">CPF</label>
+                                    <input type="text" name="cpf" class="form-control" placeholder="000.000.000-00" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
                                     <label class="form-label fw-bold">Cargo / Função</label>
                                     <select name="role_usuario" id="role_select" class="form-select" required onchange="atualizarLabel()">
                                         <option value="" selected disabled>Selecione...</option>
@@ -65,11 +76,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
                             </div>
 
                             <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">CPF</label>
-                                    <input type="text" name="cpf" class="form-control" placeholder="000.000.000-00" required>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <label class="form-label fw-bold">Senha Provisória</label>
                                     <input type="password" name="senha" class="form-control" required>
                                     <div class="form-text text-danger small">Informe ao funcionário para trocar no primeiro acesso.</div>
@@ -87,14 +94,13 @@ if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'admin') {
                 </div>
                 
                 <p class="text-center mt-4 text-muted small">
-                    O MedAssist rastreia todos os cadastros realizados por este painel administrativo.
+                    O MedAssist rastreia todos os cadastros realizados por este painel administrative.
                 </p>
             </div>
         </div>
     </div>
 
     <script>
-        // Pequeno script para mudar o texto conforme o cargo selecionado
         function atualizarLabel() {
             const select = document.getElementById('role_select');
             const label = document.getElementById('label_registro');

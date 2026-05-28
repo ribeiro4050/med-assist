@@ -53,7 +53,7 @@ $destino_clique = ($_SESSION['role_usuario'] === 'medico') ? 'prontuario-medico.
     <style>
         .card-paciente { transition: transform 0.2s; cursor: pointer; border-left: 5px solid #0d6efd; }
         .card-paciente:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .bg-medico { border-left-color: #6610f2 !important; } /* Cor diferenciada para destaque visual se necessário */
+        .bg-medico { border-left-color: #2776d1 !important; }
     </style>
 </head>
 <body class="bg-light">

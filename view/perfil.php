@@ -173,18 +173,18 @@
                                                                 <td><?= $item['posologia'] ?></td>
                                                                 <td>Dr. <?= $item['nome_medico'] ?></td>
                                                                 <<td>
-                                                                    <?php if ($item['ja_administrado']): ?>
-                                                                        <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Administrado</span>
-                                                                    <?php else: ?>
-                                                                        <?php if ($role_usuario === 'enfermeiro'): ?>
-                                                                            <button class="btn btn-success btn-sm" onclick="abrirModalAdministracao(<?= $item['id'] ?>, '<?= $item['medicamento_nome'] ?>')">
-                                                                                Confirmar Dose
-                                                                            </button>
-                                                                        <?php else: ?>
-                                                                            <span class="badge bg-warning text-dark">Aguardando Administração</span>
-                                                                        <?php endif; ?>
-                                                                    <?php endif; ?>
-                                                                </td>
+                                <?php if ($item['ja_administrado']): ?>
+                                    <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Administrado</span>
+                                <?php else: ?>
+                                    <?php if ($role_usuario === 'enfermeiro'): ?>
+                                        <button class="btn btn-success btn-sm" onclick="abrirModalAdministracao(<?= $item['id'] ?>, '<?= $item['medicamento_nome'] ?>')">
+                                            Confirmar Dose
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="badge bg-warning text-dark">Aguardando Administração</span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
                                                             </tr>
                                                             <?php endwhile; ?>
                                                         <?php else: ?>

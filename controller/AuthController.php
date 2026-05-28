@@ -2,7 +2,7 @@
 session_start();
 require_once '../Model/conexao.php';
 require_once '../Model/AuthService.php';
-require_once 'RecuperacaoEmailController.php'; // Certifique-se que o caminho está correto
+require_once 'RecuperacaoEmailController.php';
 
 $auth = new AuthService($conexao);
 
@@ -23,7 +23,6 @@ if (isset($_POST['login_usuario'])) {
         $_SESSION['role_usuario'] = $user['role'];
         $_SESSION['mensagem'] = "Bem-vindo(a), " . $user['nome'] . "!";
 
-        // Redirecionamento baseado na Role
         $urls = [
             'paciente'   => 'home.php',
             'enfermeiro' => 'home-enfermeiro.php',
@@ -53,26 +52,10 @@ if (isset($_GET['logout'])) {
 // --- 3. RECUPERAÇÃO DE SENHA (SOLICITAÇÃO) ---
 if (isset($_POST['esqueci_senha'])) {
     $email = filtrar_sql($_POST['email']);
-    $query = mysqli_query($conexao, "SELECT id FROM usuarios WHERE email = '$email'");
     
-    if (mysqli_num_rows($query) > 0) {
-        $codigo = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-        $expiracao = date('Y-m-d H:i:s', strtotime('+15 minutes'));
-
-        mysqli_query($conexao, "UPDATE recuperacao_senha SET usado = 1 WHERE email = '$email'");
-        $sql = "INSERT INTO recuperacao_senha (email, codigo, data_expiracao) VALUES ('$email', '$codigo', '$expiracao')";
-        
-        if (mysqli_query($conexao, $sql)) {
-            if (RecuperacaoEmailController::enviarCodigo($email, $codigo)) {
-                $_SESSION['mensagem'] = "Código enviado com sucesso!";
-            } else {
-                $_SESSION['mensagem'] = "Erro ao enviar e-mail. Verifique o banco (Teste).";
-            }
-            $_SESSION['email_recuperacao'] = $email;
-            header('Location: ../view/verificar-codigo.php');
-        }
+    if ($auth->solicitarRecuperacao($email)) {
+        header('Location: ../view/verificar-codigo.php');
     } else {
-        $_SESSION['mensagem'] = "E-mail não encontrado.";
         header('Location: ../view/login.php');
     }
     exit;
@@ -82,17 +65,10 @@ if (isset($_POST['esqueci_senha'])) {
 if (isset($_POST['validar_codigo'])) {
     $email = $_SESSION['email_recuperacao'];
     $codigo_digitado = filtrar_sql($_POST['codigo_verificacao']);
-    $agora = date('Y-m-d H:i:s');
 
-    $sql = "SELECT * FROM recuperacao_senha 
-            WHERE email = '$email' AND codigo = '$codigo_digitado' 
-            AND usado = 0 AND data_expiracao > '$agora' LIMIT 1";
-
-    if (mysqli_num_rows(mysqli_query($conexao, $sql)) > 0) {
-        $_SESSION['pode_mudar_senha'] = true;
+    if ($auth->validarCodigoRecuperacao($email, $codigo_digitado)) {
         header('Location: ../view/nova-senha.php');
     } else {
-        $_SESSION['mensagem'] = "Código inválido ou expirado.";
         header('Location: ../view/verificar-codigo.php');
     }
     exit;
@@ -110,12 +86,10 @@ if (isset($_POST['atualizar_senha_esquecida'])) {
         exit;
     }
 
-    $hash = password_hash($nova_senha, PASSWORD_DEFAULT);
-    if (mysqli_query($conexao, "UPDATE usuarios SET senha = '$hash' WHERE email = '$email'")) {
-        mysqli_query($conexao, "UPDATE recuperacao_senha SET usado = 1 WHERE email = '$email'");
-        unset($_SESSION['email_recuperacao'], $_SESSION['pode_mudar_senha']);
-        $_SESSION['mensagem'] = "Senha atualizada! Faça login.";
+    if ($auth->atualizarSenhaEsquecida($email, $nova_senha)) {
         header('Location: ../view/login.php');
+    } else {
+        header('Location: ../view/nova-senha.php');
     }
     exit;
 }

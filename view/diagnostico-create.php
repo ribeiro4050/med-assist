@@ -1,26 +1,4 @@
-<?php
-    if (session_status() === PHP_SESSION_NONE) { session_start(); }
-    
-    // Trava de Segurança: Apenas médicos e administradores[cite: 5, 6]
-    if (!isset($_SESSION['logado']) || ($_SESSION['role_usuario'] !== 'medico' && $_SESSION['role_usuario'] !== 'admin')) {
-        header("Location: login.php"); exit;
-    }
-
-    require_once '../Model/conexao.php';
-    
-    // Captura os IDs via GET vindo do Hub de Atendimento
-    $triagem_id = $_GET['triagem_id'] ?? '';
-    $paciente_id = $_GET['paciente_id'] ?? '';
-
-    if (empty($triagem_id) || empty($paciente_id)) {
-        header("Location: painel-medico.php"); exit;
-    }
-
-    // Busca o nome do paciente para exibição no cabeçalho[cite: 5]
-    $sql = "SELECT nome FROM usuarios WHERE id = '$paciente_id'";
-    $res = mysqli_query($conexao, $sql);
-    $p = mysqli_fetch_assoc($res);
-?>
+<?php require_once '../controller/DiagnosticoController.php'; ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
