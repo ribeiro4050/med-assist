@@ -1,5 +1,13 @@
 <?php require_once '../controller/DiagnosticoController.php'; ?>
 
+<?php
+/**
+ * @var array $p
+ * @var string $triagem_id
+ * @var string $paciente_id
+ */
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>

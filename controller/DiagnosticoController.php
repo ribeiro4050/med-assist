@@ -1,11 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { 
-    session_start(); 
-}
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
-// GARANTIA DE SESSÃO: Se não estiver logado, vai para o login
-if (!isset($_SESSION['logado'])) {
-    header("Location: login.php"); 
+// Se não estiver logado, ou se o papel (role) NÃO for médico: Bloqueia!
+if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'medico') {
+    $_SESSION['mensagem'] = "Acesso negado. Apenas médicos podem emitir laudos e diagnósticos.";
+    header("Location: ../view/index.php"); 
     exit;
 }
 

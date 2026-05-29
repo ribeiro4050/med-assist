@@ -101,3 +101,6 @@ $v_freq  = validarFrequencia($t['frequencia_cardiaca']);
 $v_sat   = validarSaturacao($t['saturacao']);
 $v_press = validarPressao($t['pressao_sistolica'], $t['pressao_diastolica']);
 $v_imc   = calcularIMC($t['peso'], $t['altura']);
+
+// agora o controller chama a view, não é mais view first
+require_once '../view/atendimento-hub.php';

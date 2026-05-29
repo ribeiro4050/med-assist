@@ -107,8 +107,8 @@
                                                    title="Ver Triagem Completa">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="atendimento-hub.php?paciente_id=<?= $p['paciente_id']; ?>&triagem_id=<?= $p['triagem_id']; ?>" 
-                                                   class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm">
+                                                <a href="../controller/AtendimentoHubController.php?paciente_id=<?= $p['paciente_id']; ?>&triagem_id=<?= $p['triagem_id']; ?>" 
+                                                class="btn btn-primary btn-sm px-4 rounded-pill shadow-sm">
                                                     <i class="fas fa-stethoscope me-1"></i> Atender
                                                 </a>
                                             </div>

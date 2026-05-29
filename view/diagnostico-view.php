@@ -4,6 +4,12 @@
     // Carrega o controlador para obter os dados processados do laudo ($diag)
     require_once '../controller/DiagnosticoController.php'; 
 
+    /**
+     * @var array $diag
+     * @var string $triagem_id
+     * @var string $token_limpo
+     */
+
     // =========================================================================
     // VALIDAÇÃO DE SEGURANÇA SIMPLIFICADA (Anti-invasão / IDOR)
     // =========================================================================
