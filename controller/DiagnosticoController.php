@@ -124,7 +124,7 @@ class DiagnosticoController {
             $_SESSION['mensagem'] = "Erro ao gravar o laudo.";
         }
         
-        header("Location: ../view/atendimento-hub.php?triagem_id=" . $dados['triagem_id']);
+        header("Location: ../view/../controller/AtendimentoHubController.php?triagem_id=" . $dados['triagem_id']);
         exit;
     }
 }

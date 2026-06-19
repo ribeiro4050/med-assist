@@ -78,7 +78,7 @@ $triagem = $medicoService->buscarUltimaTriagem($id_paciente);
                         <h5 class="mb-0 text-primary"><i class="bi bi-journal-medical"></i> Prescrições Vigentes</h5>
                         
                         <?php if ($triagem): ?>
-                            <a href="atendimento-hub.php?triagem_id=<?= $triagem['id'] ?>" class="btn btn-prescrever btn-sm">
+                            <a href="../controller/AtendimentoHubController.php?triagem_id=<?= $triagem['id'] ?>&paciente_id=<?= $id_paciente ?>" class="btn btn-prescrever btn-sm">
                                 <i class="bi bi-plus-lg"></i> Nova Prescrição
                             </a>
                         <?php else: ?>

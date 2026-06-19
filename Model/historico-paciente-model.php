@@ -56,10 +56,15 @@ class HistoricoPacienteService {
         $historico_combinado = []; 
         
         // 1. Buscar Histórico de Exames
-        $sql_exames = "SELECT id, data, tipo, resultado, link_laudo, 'Exame' AS tipo_evento 
-                       FROM exame 
+        $sql_exames = "SELECT id, 
+                              data_solicitacao AS data, 
+                              carater_solicitacao AS tipo, 
+                              descricao_exames AS resultado, 
+                              'Exame' AS tipo_evento 
+                       FROM guia_exames 
                        WHERE paciente_id = ? 
-                       ORDER BY data DESC";
+                       ORDER BY data_solicitacao DESC";
+                       
         if ($stmt_exames = mysqli_prepare($this->db, $sql_exames)) {
             mysqli_stmt_bind_param($stmt_exames, "i", $paciente_id);
             mysqli_stmt_execute($stmt_exames);

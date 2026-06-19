@@ -49,7 +49,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between border-top pt-4">
-                                <a href="atendimento-hub.php?triagem_id=<?= $triagem_id ?>" class="btn btn-outline-secondary px-4 rounded-pill">
+                                <a href="javascript:history.go(-1)" class="btn btn-outline-secondary px-4 rounded-pill">
                                     <i class="fas fa-times me-2"></i>Cancelar
                                 </a>
                                 <button type="submit" name="btn_salvar_diagnostico" class="btn btn-success btn-lg px-5 rounded-pill shadow">

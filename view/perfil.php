@@ -202,7 +202,7 @@
                                             <tbody>
                                                 <?php while($d = mysqli_fetch_array($query_diagnosticos)): ?>
                                                 <tr>
-                                                    <td><?= date('d/m/Y', Caesar: strtotime($d['data_diagnostico'])) ?></td>
+                                                    <td><?= date('d/m/Y', strtotime($d['data_diagnostico'])) ?></td>
                                                     <td><span class="badge bg-danger"><?= $d['cid_10'] ?></span></td>
                                                     <td>Dr. <?= $d['nome_medico'] ?></td>
                                                     <td><a href="diagnostico-view.php?id=<?= $d['id'] ?>" class="btn btn-sm btn-outline-dark"><i class="bi bi-file-text"></i> Detalhes</a></td>

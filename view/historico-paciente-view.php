@@ -1,112 +1,58 @@
+<?php
+/**
+ * Variáveis injetadas pelo historico-paciente-controller.php
+ * @var string $nome_paciente
+ * @var array $historico
+ */
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>Histórico de <?= htmlspecialchars($nome_paciente) ?> - MedAssist</title> 
     <link rel="icon" type="image/png" href="../img/logo.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <!-- jogar no arquivo style.css -->
     <style>
-        .timeline {
-            border-left: 3px solid #dee2e6;
-            background: #fff;
-            margin: 0 auto;
-            letter-spacing: 0.2px;
-            position: relative;
-            padding: 50px 0;
-            list-style: none;
-        }
-        .timeline li {
-            padding-left: 20px;
-            padding-right: 15px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .timeline li:before {
-            content: "";
-            width: 15px;
-            height: 15px;
-            background: #007bff; 
-            position: absolute;
-            left: -9px;
-            border-radius: 50%;
-            top: 5px;
-            z-index: 1;
-            border: 2px solid #fff;
-        }
+        .timeline { border-left: 3px solid #dee2e6; background: #fff; margin: 0 auto; letter-spacing: 0.2px; position: relative; padding: 50px 0; list-style: none; }
+        .timeline li { padding-left: 20px; padding-right: 15px; margin-bottom: 20px; position: relative; }
+        .timeline li:before { content: ""; width: 15px; height: 15px; background: #007bff; position: absolute; left: -9px; border-radius: 50%; top: 5px; z-index: 1; border: 2px solid #fff; }
         .evento-exame:before { background: #28a745 !important; } 
         .evento-diagnostico:before { background: #dc3545 !important; } 
         .evento-receita:before { background: #ffc107 !important; } 
     </style>
 </head>
 <body>
-<?php 
-include('navbar.php');
-?>
+<?php include('navbar.php'); ?>
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-10 offset-md-1">
-            <h2 class="mb-4">Histórico Clínico de <span class="text-primary"><?= htmlspecialchars($nome_paciente) ?></span>
-            </h2>
+            <h2 class="mb-4">Histórico Clínico de <span class="text-primary"><?= htmlspecialchars($nome_paciente) ?></span></h2>
             <hr>
             
-            <!-- Verifica se existe o historico/ se a variavel está vazia, printa a mensagem -->
             <?php if (empty($historico)): ?>
-                <div class="alert alert-info">
-                    Nenhum registro de atendimento, exame ou diagnostico encontrado para este paciente.
-                </div>
-
+                <div class="alert alert-info">Nenhum registro de atendimento, exame ou diagnostico encontrado para este paciente.</div>
             <?php else: ?>  
                 <ul class="timeline">
-
-                <!-- looping PRINCIPAL: itera cada item/$evento dentro do array "$historico" -->
-                    <?php foreach ($historico as $evento): 
-
-                        // Adiciona um sufixo a evento ex: "evento-exame" ou "evento-diagnostico"
-                        // strtolower para deixar minusculo
-                        // str_replace para trocar espaço por hífene e adicionar o tipo de evento no final, ele acha o espaço em branco e adcione o "-" dai depois coloca o tipo_evento no final sintaxe: str_replace( $search, $replace, $subject );
+                <?php foreach ($historico as $evento): 
                         $classe_css = strtolower(str_replace(' ', '-', $evento['tipo_evento']));
-
-
-                        // Formata a data para o padrão brasileiro
-                        $data_formatada = date('d/m/Y', strtotime($evento['data'])); //"$evento['data']" pega o valor de 'data' que vem lá do model e está no formato do Banco de dados. "strtotime" converte a string data do data base para segundos. E date('d/m/Y',...) converte para o formato brasileiro
+                        $data_formatada = date('d/m/Y', strtotime($evento['data'])); 
                         $titulo_evento = $evento['tipo_evento']; 
                         $detalhes = "";
 
-                        // Define os detalhes a serem exibidos com base no tipo
                         if ($evento['tipo_evento'] == 'Exame') {
-
-                            // htmlspecialchars -> para evitar XSS (Cross site Scripting), que é uma vulnerabilidade de segurança. É Basicamente uma proteção para que outros usarios não insiram scripts maliciosos na pag de outros usuarios.
-                            // n12br -> é responsavel pela formatação de quebras de linha, transforma enter em <br>
                             $detalhes = "Tipo: " . htmlspecialchars($evento['tipo']) . "<br>Resultado: " . nl2br(htmlspecialchars($evento['resultado']));
-                        
                         } elseif ($evento['tipo_evento'] == 'diagnostico') {
-                        
-                        $cid = htmlspecialchars($evento['cid_10'] ?? 'N/A');
-                        $desc = nl2br(htmlspecialchars($evento['descricao'] ?? 'Sem descrição'));
-                        $previsao = htmlspecialchars($evento['resultadoPrevisto'] ?? 'Não informada');
-                        $prob = htmlspecialchars($evento['probabilidade'] ?? '0');
-
-                        $detalhes = "CID-10: " . $cid . 
-                                    "<br>Descrição: " . $desc .
-                                    "<br>Previsão: " . $previsao . 
-                                    " (Probabilidade: " . $prob . "%)";
-                        }
-
-
-                        // Itera sobre a nova chave 'itens' para mostrar os medicamentos e suas especificações
-                        elseif ($evento['tipo_evento'] == 'Receita') {
-                            
-                            // $detalhes agora é uma lista não ordenada
+                            $cid = htmlspecialchars($evento['cid_10'] ?? 'N/A');
+                            $desc = nl2br(htmlspecialchars($evento['descricao'] ?? 'Sem descrição'));
+                            $detalhes = "<strong>CID-10:</strong> " . $cid . "<br><strong>Descrição:</strong> " . $desc;
+                        } elseif ($evento['tipo_evento'] == 'Receita') {
                             $detalhes = "<ul class='list-unstyled mb-0'>";
-
                             if (!empty($evento['itens'])) {
-                                foreach ($evento['itens'] as $item) { // Percorre o array de itens da receita
-                                    // ".=" faz uma concatenação, vai adcionando mais informação a variavel $detalhes
+                                foreach ($evento['itens'] as $item) { 
                                     $detalhes .= "<li><strong>Medicamento:</strong> " . htmlspecialchars($item['medicamento_nome']) . "</li>";
                                     $detalhes .= "<li><strong>Concentração:</strong> " . htmlspecialchars($item['concentracao']) . "</li>";
-                                    $detalhes .= "<li><strong>Posologia:</strong> " . nl2br(htmlspecialchars($item['posologia'])) . "</li>";
+                                    $detalhes .= "<li><strong>Posologia:</strong> " . nl2br(htmlspecialchars($item['posologia'])) . "</li><hr class='my-1'>";
                                 }
                             } else {
                                 $detalhes .= "<li>Nenhum item encontrado para esta receita.</li>";
@@ -117,17 +63,13 @@ include('navbar.php');
                         <li class="timeline-item evento-<?= $classe_css ?>">
                             <div class="card shadow-sm">
                                 <div class="card-body">
-                                    
-                                <!--Usa Operado ternario(if-else) pra dar um destaque visual ao Diagnostico mudano a cor dependedo se for danger(verdadeiro) ou primary(falso)    -->
                                     <h5 class="card-title d-flex justify-content-between align-items-center text-<?= ($evento['tipo_evento'] == 'diagnostico' ? 'danger' : 'primary') ?>">
                                         <?= $titulo_evento ?> 
                                         <span class="badge bg-secondary text-white" style="font-size: 0.8rem;">
                                             <i class="bi bi-calendar3"></i> <?= $data_formatada ?>
                                         </span>
                                     </h5>
-                                    <p class="card-text mb-0">
-                                        <?= $detalhes ?>
-                                    </p>
+                                    <p class="card-text mb-0"><?= $detalhes ?></p>
                                 </div>
                             </div>
                         </li>
@@ -141,6 +83,5 @@ include('navbar.php');
         </div>
     </div>
 </div>
-
 </body>
 </html>

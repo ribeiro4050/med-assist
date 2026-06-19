@@ -24,7 +24,7 @@ class ExameController {
 
         if ($this->service->criarGuiaExame($dados)) {
             $_SESSION['mensagem'] = "Guia de Exame gerada com sucesso!";
-            header("Location: ../view/atendimento-hub.php?triagem_id=" . $dados['triagem_id'] . "&paciente_id=" . $dados['paciente_id']);
+            header("Location: ../view/../controller/AtendimentoHubController.php?triagem_id=" . $dados['triagem_id'] . "&paciente_id=" . $dados['paciente_id']);
         } else {
             $_SESSION['mensagem'] = "Erro ao processar a guia no servidor.";
             header("Location: ../view/guia-exame-create.php?paciente_id=" . $post['paciente_id'] . "&triagem_id=" . $post['triagem_id']);

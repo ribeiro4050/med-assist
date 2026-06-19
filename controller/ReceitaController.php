@@ -36,7 +36,7 @@ if (isset($_POST['create_receita'])) {
         $_SESSION['mensagem'] = "Receita prescrita com sucesso!";
         
         if (!empty($triagem_id)) {
-            header('Location: ../view/atendimento-hub.php?triagem_id=' . $triagem_id);
+            header('Location: ../view/../controller/AtendimentoHubController.php?triagem_id=' . $triagem_id);
         } else {
             header('Location: ../view/receitas.php');
         }
