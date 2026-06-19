@@ -1,10 +1,10 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
-// Se não estiver logado, ou se o papel (role) NÃO for médico: Bloqueia!
-if (!isset($_SESSION['logado']) || $_SESSION['role_usuario'] !== 'medico') {
-    $_SESSION['mensagem'] = "Acesso negado. Apenas médicos podem emitir laudos e diagnósticos.";
-    header("Location: ../view/index.php"); 
+// VALIDAÇÃO DE SESSÃO BÁSICA (Apenas garante que o usuário está no sistema)
+if (!isset($_SESSION['logado'])) {
+    $_SESSION['mensagem'] = "Por favor, faça login para acessar este recurso.";
+    header("Location: ../view/login.php"); 
     exit;
 }
 
@@ -24,9 +24,10 @@ class DiagnosticoController {
      * Ação: Prepara os dados necessários para renderizar a View de cadastro
      */
     public function carregarTelaCadastro($get) {
-        // TRAVA DE SEGURANÇA ORIGINAL (Movida para dentro da ação específica de criação)
+        // TRAVA DE SEGURANÇA: Apenas médicos podem acessar a tela de emissão
         if ($_SESSION['role_usuario'] !== 'medico' && $_SESSION['role_usuario'] !== 'admin') {
-            header("Location: login.php"); 
+            $_SESSION['mensagem'] = "Acesso negado. Você não tem permissão para emitir laudos.";
+            header("Location: painel-medico.php"); 
             exit;
         }
 
@@ -38,7 +39,6 @@ class DiagnosticoController {
             exit;
         }
 
-        // Executa a busca que antes ficava na View
         $sql = "SELECT nome FROM usuarios WHERE id = '$paciente_id'";
         $res = mysqli_query($this->conexao, $sql);
         $p = mysqli_fetch_assoc($res);
@@ -62,7 +62,6 @@ class DiagnosticoController {
             exit;
         }
 
-        // Busca os dados completos do diagnóstico, paciente e médico no banco (Trazido da View)
         $id = mysqli_real_escape_string($this->conexao, $id);
         $sql = "SELECT d.id, d.data, d.cid_10, d.descricao, d.paciente_id, 
                        u_pac.nome as paciente_nome, 
@@ -82,12 +81,10 @@ class DiagnosticoController {
         }
 
         // =========================================================================
-        // VALIDAÇÃO DE SEGURANÇA SIMPLIFICADA ORIGINAL (Anti-invasão / IDOR)
+        // VALIDAÇÃO DE SEGURANÇA ANTI-IDOR (Médicos e o próprio paciente dono do laudo podem ver)
         // =========================================================================
-        // Bloqueia se: Não estiver logado OU (Se for paciente E o ID logado for diferente do dono do laudo)
         if (
-            !isset($_SESSION['logado']) || 
-            ($_SESSION['role_usuario'] === 'paciente' && $_SESSION['id_usuario'] != $diag['paciente_id'])
+            $_SESSION['role_usuario'] === 'paciente' && $_SESSION['id_usuario'] != $diag['paciente_id']
         ) {
             $_SESSION['mensagem'] = "Acesso negado. Você não tem permissão para ver este documento.";
             header("Location: login.php"); 
@@ -104,8 +101,9 @@ class DiagnosticoController {
      * Ação: Processa o formulário de envio (POST)
      */
     public function criar($post) {
-        // TRAVA DE SEGURANÇA ORIGINAL (Garante que apenas médicos e admins criem registros)
+        // TRAVA DE SEGURANÇA: Garante que apenas médicos e admins criem registros
         if ($_SESSION['role_usuario'] !== 'medico' && $_SESSION['role_usuario'] !== 'admin') {
+            $_SESSION['mensagem'] = "Acesso negado. Apenas médicos podem emitir laudos e diagnósticos.";
             header("Location: login.php"); 
             exit;
         }
@@ -136,7 +134,6 @@ $controller = new DiagnosticoController($conexao);
 // ROTEAMENTO DE AÇÕES (DETERMINA O FLUXO DA APLICAÇÃO)
 // ==========================================================
 
-// Se a View estiver requisitando renderização (Acesso via GET)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
     // Rota: Carregamento da tela de Cadastro (diagnostico-create.php)
@@ -154,7 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-// Se a View estiver enviando o formulário para salvar (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btn_salvar_diagnostico'])) {
     $controller->criar($_POST);
 }
