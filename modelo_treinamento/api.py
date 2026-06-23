@@ -95,15 +95,24 @@ def predict_heart_disease(dados: DadosPaciente):
         print(df_paciente.values[0].tolist()) # Os valores reais que o modelo está vendo
         print("-----------------------------------------------------")
         
-        # 5. PREVISÃO
+        # 5. PREVISÃO E CÁLCULO DE PROBABILIDADES
         previsao = MODELO_CLASSIFICADOR.predict(df_paciente)[0]
-        prob_positiva = MODELO_CLASSIFICADOR.predict_proba(df_paciente)[:, 1][0] 
+        prob_positiva = float(MODELO_CLASSIFICADOR.predict_proba(df_paciente)[:, 1][0])
         
-        # 6. RESPOSTA
+        prob_doenca = round(prob_positiva * 100, 2)
+        prob_saudavel = round((1.0 - prob_positiva) * 100, 2)
+        
+        # 6. RESPOSTA (Texto descritivo e acadêmico para o médico)
+        texto_diagnostico = (
+            f"De acordo com o método Random Forest, treinado na base de dados clínica UCI Heart Disease, "
+            f"o modelo aponta:\n\n {prob_doenca}% de probabilidade do paciente possuir doença cardíaca "
+            f"e \n{prob_saudavel}% de probabilidade de não possuir a doença."
+        )
+
         resultado = {
             "previsao_binaria": int(previsao),
-            "probabilidade_doenca": round(prob_positiva * 100, 2),
-            "diagnostico": "Doença Cardiáca Presente" if previsao == 1 else "Doença Cardiáca Ausente"
+            "probabilidade_doenca": prob_doenca,
+            "diagnostico": texto_diagnostico
         }
         
         return resultado

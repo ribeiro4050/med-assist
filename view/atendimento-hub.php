@@ -134,7 +134,7 @@
             </div>
             <div class="col-md-12 mt-4">
                 <button type="button" class="btn btn-warning btn-lg w-100 shadow-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalRiscoCardiaco">
-                    <i class="fas fa-brain me-2"></i> Analisar Risco Cardíaco com Inteliência Artificial
+                    <i class="fas fa-brain me-2"></i> Analisar Risco Cardíaco com Inteligência Artificial
                 </button>
             </div>
         </div>
@@ -299,9 +299,9 @@
                     </div>
                 </form>
 
-                <div id="resultadoIA" class="mt-4 p-3 rounded d-none text-center">
-                    <h4 id="textoDiagnostico" class="fw-bold"></h4>
-                    <p class="mb-0 fs-5">Probabilidade: <span id="textoProbabilidade" class="fw-bold"></span>%</p>
+                <div id="resultadoIA" class="mt-4 p-4 rounded d-none shadow-sm text-start">
+                    <h5 class="fw-bold mb-3 border-bottom pb-2"><i class="fas fa-robot me-2"></i>Relatório da Inteligência Artificial</h5>
+                    <p id="textoDiagnostico" class="mb-0 fs-6 lh-base text-dark"></p>
                 </div>
 
             </div>
@@ -365,17 +365,17 @@
                     // 3. Mostra o resultado na tela do médico
                     const divResultado = document.getElementById('resultadoIA');
                     const txtDiag = document.getElementById('textoDiagnostico');
-                    const txtProb = document.getElementById('textoProbabilidade');
 
-                    divResultado.classList.remove('d-none', 'bg-danger', 'bg-success', 'text-white');
+                    divResultado.classList.remove('d-none', 'alert-danger', 'alert-success');
                     
+                    // Coloca o texto formal completo que vem da API
                     txtDiag.innerText = data.diagnostico;
-                    txtProb.innerText = data.probabilidade_doenca;
 
+                    // Muda as cores de fundo para tons mais suaves (Alertas do Bootstrap)
                     if (data.previsao_binaria === 1) {
-                        divResultado.classList.add('bg-danger', 'text-white'); // Vermelho = Alerta
+                        divResultado.classList.add('alert', 'alert-danger'); // Fundo avermelhado
                     } else {
-                        divResultado.classList.add('bg-success', 'text-white'); // Verde = Seguro
+                        divResultado.classList.add('alert', 'alert-success'); // Fundo esverdeado
                     }
                 } else {
                     alert('Erro da IA: ' + (data.erro || 'Erro desconhecido.'));
@@ -387,7 +387,6 @@
             }
         }
     </script>
-
 
 </body>
 </html>

@@ -41,7 +41,7 @@
                         $detalhes = "";
 
                         if ($evento['tipo_evento'] == 'Exame') {
-                            $detalhes = "Tipo: " . htmlspecialchars($evento['tipo']) . "<br>Resultado: " . nl2br(htmlspecialchars($evento['resultado']));
+                            $detalhes = "Tipo: " . htmlspecialchars($evento['tipo']) . "<br>Descrição: " . nl2br(htmlspecialchars($evento['resultado']));
                         } elseif ($evento['tipo_evento'] == 'diagnostico') {
                             $cid = htmlspecialchars($evento['cid_10'] ?? 'N/A');
                             $desc = nl2br(htmlspecialchars($evento['descricao'] ?? 'Sem descrição'));
