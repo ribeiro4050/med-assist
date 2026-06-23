@@ -11,6 +11,10 @@ O **MedAssist** é um Sistema de Gestão Hospitalar e Prontuário Eletrónico in
 
 O grande diferencial tecnológico deste projeto é a sua **Arquitetura Híbrida**: um núcleo monolítico para a gestão hospitalar (desenvolvido no padrão MVC com Service Pattern) integrado a um **microsserviço de Inteligência Artificial**, que utiliza Machine Learning para prever o risco de doenças cardíacas com base em exames e sinais vitais.
 
+## 📚 Documentação Oficial
+Para uma visão aprofundada sobre as análise de requisitos, e diagramas de banco de dados, consulte a nossa documentação técnica completa:
+
+👉 [Clique aqui para acessar a Documentação em PDF](./docs/Documentacao-MedAssist.pdf)
 ---
 
 ## ✨ Funcionalidades Principais
